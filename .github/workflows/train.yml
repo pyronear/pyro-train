@@ -30,10 +30,6 @@ jobs:
           ec2-instance-type: g4dn.xlarge
           subnet-id: subnet-0ed91f5fc60959086
           security-group-id: sg-05cd9ff586699e8db
-          pre-runner-script: |
-            curl -LsSf https://astral.sh/uv/install.sh | sh
-            echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
   train:
     name: Run training
     needs: start-runner
@@ -41,6 +37,9 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
