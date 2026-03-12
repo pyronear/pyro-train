@@ -18,11 +18,8 @@ The Data pipeline is organized with a [dvc.yaml](./dvc.yaml) file.
 This section list and describes all the DVC stages that are defined in the
 [dvc.yaml](./dvc.yaml) file:
 
-- __build_model_input__: Generate model input for YOLO custom dataset training
-using the provided raw dataset.
-- __train_yolo_baseline_small__: Train a YOLO baseline model on a subset of the
-full dataset.
-- __train_yolo_baseline__: Train a YOLO baseline model on the full dataset.
+- __subsample_model_input__: Sample 5% of the imported `yolo_train_val` dataset for fast iteration.
+- __train_yolo_baseline__: Train a YOLO baseline model on the 5% subsampled dataset.
 - __train_yolo_best__: Train the best YOLO model on the full dataset.
 - __build_manifest_yolo_best__: Build the manifest.yaml file to attach with the model.
 - __export_yolo_best__: Export the best YOLO model to different formats (ONNX, NCNN).
@@ -49,51 +46,19 @@ Activate the `uv` virutalenv:
 source .venv/bin/activate
 ```
 
-### Git LFS
-
-Make sure [`git-lfs`](https://git-lfs.com/) is installed on your system.
-
-Run the following command to check:
-
-```sh
-git lfs install
-```
-
-If not installed, one can install it with the following:
-
-#### Linux
-
-```sh
-sudo apt install git-lfs
-git-lfs install
-```
-
-#### Mac
-
-```sh
-brew install git-lfs
-git-lfs install
-```
-
-#### Windows
-
-Download and run the latest [windows installer](https://github.com/git-lfs/git-lfs/releases).
-
-
 ### Data Dependencies
 
-To get the data dependencies one can use DVC - To fully use this
-repository you would need access to our DVC remote storage which is
-currently reserved for Pyronear members. On request, you will be provided with
-AWS credentials to access our remote storage.
-
-Pull the data files needed for training the model:
+The dataset is imported directly from [pyro-dataset](https://github.com/pyronear/pyro-dataset)
+via DVC — no manual download needed. Pull the import:
 
 ```sh
-dvc get . ./data/03_model_input/
+dvc pull data/03_model_input/yolo_train_val.dvc
 ```
 
-Pull all the data files tracked by DVC using this command:
+For the full DVC remote (model artifacts), you need access to the Pyronear S3 remote,
+reserved for Pyronear members. On request, you will be provided with AWS credentials.
+
+Pull all DVC-tracked files:
 
 ```sh
 dvc pull
@@ -138,16 +103,6 @@ conventions](https://docs.kedro.org/en/stable/faq/faq.html#what-is-data-engineer
 ### Library Code
 
 The library code is available under the `pyronear_mlops` folder.
-
-### Notebooks
-
-The notebooks live in the `notebooks` folder. They are automatically synced to
-the Git LFS storage.
-Please follow [this
-convention](https://drivendata.github.io/cookiecutter-data-science/#notebooks-are-for-exploration-and-communication)
-to name your Notebooks.
-
-`<step>-<ghuser>-<description>.ipynb` - e.g., `0.3-mateo-visualize-distributions.ipynb`.
 
 ### Scripts
 
@@ -256,7 +211,7 @@ Adapt and run this command to launch a specific hyperparamater space search:
 
 ```sh
 uv run python ./scripts/model/yolo/hyperparameter_search.py \
-   --data ./data/03_model_input/wildfire/full/datasets/data.yaml \
+   --data ./data/03_model_input/yolo_train_val/data.yaml \
    --output-dir ./data/04_models/yolo/ \
    --experiment-name "random_hyperparameter_search" \
    --filepath-space-yaml ./scripts/model/yolo/spaces/default.yaml \

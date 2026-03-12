@@ -10,8 +10,28 @@ from pathlib import Path
 
 from ultralytics import settings
 
-from pyro_train.data.utils import yaml_read
+from pyro_train.data.utils import yaml_read, yaml_write
 from pyro_train.model.yolo.train import load_pretrained_model, train
+from pyro_train.utils import resolve_device
+
+
+def resolve_data_yaml(data_yaml_path: Path) -> Path:
+    """
+    Ultralytics resolves a relative `path:` key in data.yaml against its own
+    datasets_dir, not the yaml file location.  When the key is present and
+    relative, rewrite it to an absolute path in a sibling file so YOLO can
+    find the images regardless of where the script is run from.
+    """
+    content = yaml_read(data_yaml_path)
+    if "path" not in content:
+        return data_yaml_path
+    dataset_path = Path(content["path"])
+    if dataset_path.is_absolute():
+        return data_yaml_path
+    content["path"] = str((data_yaml_path.parent / dataset_path).resolve())
+    patched_path = data_yaml_path.parent / "_data.yaml"
+    yaml_write(to=patched_path, data=content)
+    return patched_path
 
 
 def make_cli_parser() -> argparse.ArgumentParser:
@@ -42,6 +62,12 @@ def make_cli_parser() -> argparse.ArgumentParser:
         help="Yaml configuration file to train the model on",
         required=True,
         type=Path,
+    )
+    parser.add_argument(
+        "--device",
+        help="Device to use for training (cuda, mps, cpu). Defaults to best available.",
+        default=None,
+        type=str,
     )
     parser.add_argument(
         "-log",
@@ -86,10 +112,14 @@ if __name__ == "__main__":
         # Update ultralytics settings to log with MLFlow
         settings.update({"mlflow": True})
 
+        device = args["device"] or resolve_device()
+        logging.info(f"Using device: {device}")
+
         train(
             model=model,
-            data_yaml_path=args["data"],
+            data_yaml_path=resolve_data_yaml(args["data"]),
             params=params,
+            device=device,
             project=str(args["output_dir"]),
             experiment_name=args["experiment_name"],
         )

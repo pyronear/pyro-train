@@ -193,24 +193,17 @@ if __name__ == "__main__":
 
         logging.info(f"Creating dirs at {output_dir}")
         shutil.rmtree(output_dir, ignore_errors=True)
+        make_yolov8_folder_structure(output_dir)
 
-        dir_full = output_dir / "full"
-        logging.info(f"creating the full dataset located at {dir_full}")
-        make_yolov8_folder_structure(dir_full)
-        copy_data(input_dir=input_dir, output_dir=dir_full / "datasets")
-        write_data_yaml(dir_full / "datasets" / "data.yaml")
-
-        dir_small = output_dir / "small"
-        logging.info(f"creating the small dataset located at {dir_small}")
-        make_yolov8_folder_structure(dir_small)
+        logging.info(f"Creating {sampling_ratio*100:.0f}% sample at {output_dir}")
         run_file_copy(
             sample_dataset(
                 input_dir=input_dir,
-                output_dir=dir_small / "datasets",
+                output_dir=output_dir / "datasets",
                 sampling_ratio=sampling_ratio,
                 random_seed=random_seed,
             )
         )
-        write_data_yaml(dir_small / "datasets" / "data.yaml")
+        write_data_yaml(output_dir / "datasets" / "data.yaml")
 
         exit(0)

@@ -1,6 +1,17 @@
 import hashlib
 from pathlib import Path
 
+import torch
+
+
+def resolve_device() -> str:
+    """Return the best available device: cuda > mps > cpu."""
+    if torch.cuda.is_available():
+        return "cuda"
+    if torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
 
 def compute_file_content_sha256(filepath: Path) -> str:
     """
