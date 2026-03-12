@@ -2,7 +2,7 @@
 name = "pyro-train"
 version = "0.3.0"
 description = "Machine Learning Training pipeline for Wildfire Detection 🔥"
-authors = ["Pyronear <contact@pyronear.org>"]
+authors = [{ name = "Pyronear", email = "contact@pyronear.org" }]
 requires-python = ">=3.11"
 readme = "README.md"
 dependencies = [
