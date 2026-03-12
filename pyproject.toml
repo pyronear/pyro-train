@@ -9,6 +9,7 @@ dependencies = [
     "ultralytics==8.4.21",
     "pandas>=2.2.2,<3",
     "ncnn>=1.0.20250503",
+    "pnnx>=1.0.20250503",
     "onnx>=1.18.0",
     "onnxruntime>=1.22.0",
     "onnxslim>=0.1.53",

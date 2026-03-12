@@ -1971,6 +1971,20 @@ wheels = [
 ]
 
 [[package]]
+name = "pnnx"
+version = "20260112"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "torch" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/26/d8/d666d76514436fc5affd8a727f98a761442df6660b61097971e50aca1444/pnnx-20260112-py3-none-macosx_10_9_universal2.macosx_10_9_x86_64.macosx_11_0_arm64.whl", hash = "sha256:da3c8eb8b579539dc72aebac93dbe5f1de6f5af5c75d5c63264ab3bf8123faa6", size = 52894640, upload_time = "2026-01-12T08:59:37.525Z" },
+    { url = "https://files.pythonhosted.org/packages/73/9e/099355b71538046838572d5200e85c4fb4dd46b939c9ea4a43bc8af3d09f/pnnx-20260112-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:b1af71894474e29bb54b005ff9e8617b98b7d98f2e205750863189fbeed241a7", size = 23408531, upload_time = "2026-01-12T08:59:40.658Z" },
+    { url = "https://files.pythonhosted.org/packages/04/1f/31b531f8db6b6b2e2baea751d4008c0cf10245c23d2ae2c0ed27287765c1/pnnx-20260112-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:702c1094074071bb508624ad883dc66fb9f0d267b8feb526a6d32b5bf6e9a385", size = 27689621, upload_time = "2026-01-12T08:59:43.308Z" },
+    { url = "https://files.pythonhosted.org/packages/ee/53/5770de33fd1f2d76105df723e1848d105b8d476a1d058175fe9b16ce619b/pnnx-20260112-py3-none-win_amd64.whl", hash = "sha256:bc15ed028f4c0a0adfdf811e5f4342cfcdcf03d65c7cd64ec57fe4e416cac877", size = 17941805, upload_time = "2026-01-12T08:59:45.949Z" },
+]
+
+[[package]]
 name = "polars"
 version = "1.38.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2243,7 +2257,7 @@ wheels = [
 
 [[package]]
 name = "pyro-train"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "ncnn" },
@@ -2251,6 +2265,7 @@ dependencies = [
     { name = "onnxruntime" },
     { name = "onnxslim" },
     { name = "pandas" },
+    { name = "pnnx" },
     { name = "ultralytics" },
 ]
 
@@ -2273,6 +2288,7 @@ requires-dist = [
     { name = "onnxruntime", specifier = ">=1.22.0" },
     { name = "onnxslim", specifier = ">=0.1.53" },
     { name = "pandas", specifier = ">=2.2.2,<3" },
+    { name = "pnnx", specifier = ">=1.0.20250503" },
     { name = "ultralytics", specifier = "==8.4.21" },
 ]
 
