@@ -1,0 +1,99 @@
+name: Train on GPU
+
+on:
+  push:
+    branches:
+      - "train_*"
+
+jobs:
+  start-runner:
+    name: Start EC2 GPU runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PAT }}
+          ec2-image-id: ami-06c62c213d8fdc88f
+          ec2-instance-type: g4dn.xlarge
+          subnet-id: subnet-0ed91f5fc60959086
+          security-group-id: sg-05cd9ff586699e8db
+          iam-role-name: ${{ secrets.EC2_IAM_ROLE_NAME }}
+          pre-runner-script: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+  train:
+    name: Run training
+    needs: start-runner
+    runs-on: ${{ needs.start-runner.outputs.label }}
+    env:
+      AWS_PROFILE: pyronear
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Pull dataset
+        run: uv run dvc pull data/03_model_input/yolo_train_val.dvc
+
+      - name: Run pipeline
+        run: uv run dvc repro
+
+      - name: Push artifacts to DVC remote
+        run: uv run dvc push
+
+      - name: Push results to result branch
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME}"
+          RESULT_BRANCH="result_${BRANCH_NAME#train_}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$RESULT_BRANCH"
+          git add dvc.lock
+          git commit -m "chore: training results from $BRANCH_NAME [skip ci]"
+          git push origin "$RESULT_BRANCH"
+
+  stop-runner:
+    name: Stop EC2 GPU runner
+    needs: [start-runner, train]
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: Stop EC2 runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.GH_PAT }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
