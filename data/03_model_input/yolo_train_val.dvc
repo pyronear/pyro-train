@@ -1,0 +1,14 @@
+md5: 2b0d0f8c88dbbd696808a3076d4788d8
+frozen: true
+deps:
+- path: data/processed/yolo_train_val
+  repo:
+    url: git@github.com:pyronear/pyro-dataset.git
+    rev: v2.0.0
+    rev_lock: 4e5e2f3635a40bafa7d3291773ec70da7e026cc6
+outs:
+- md5: fdfd35a4ac94ba1468938f7e173cfc6c.dir
+  size: 1735515846
+  nfiles: 29627
+  hash: md5
+  path: yolo_train_val
