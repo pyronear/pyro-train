@@ -1,18 +1,13 @@
 [project]
 name = "pyro-train"
-version = "0.2.0"
+version = "0.3.0"
 description = "Machine Learning Training pipeline for Wildfire Detection 🔥"
-authors = [{ name = "Arthur Caillau", email = "arthur@caillau.me" }]
-requires-python = "~=3.12"
+authors = ["Pyronear <contact@pyronear.org>"]
+requires-python = ">=3.11"
 readme = "README.md"
 dependencies = [
-    "ultralytics==8.3.113",
-    "torch>=2.2.2,<3",
-    "torchvision>=0.17.2,<0.18",
+    "ultralytics==8.4.21",
     "pandas>=2.2.2,<3",
-    "gdown>=5.1.0,<6",
-    "python-dotenv>=1.0.1,<2",
-    "pytest>=8.3.5,<9",
     "ncnn>=1.0.20250503",
     "onnx>=1.18.0",
     "onnxruntime>=1.22.0",
@@ -28,6 +23,7 @@ dev = [
     "dvc-s3>=3.2.0,<4",
     "ruff>=0.12.7",
     "pre-commit>=4.2.0",
+    "pytest>=8.3.5,<9",
 ]
 
 [build-system]
