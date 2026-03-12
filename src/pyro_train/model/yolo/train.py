@@ -18,6 +18,7 @@ def train(
     model: YOLO,
     data_yaml_path: Path,
     params: dict,
+    device: str = "cpu",
     project: str = "data/04_models/yolo/",
     experiment_name: str = "train",
 ):
@@ -58,6 +59,7 @@ def train(
         project=project,
         name=experiment_name,
         data=data_yaml_path.absolute(),
+        device=device,
         # train Parameters
         batch=params["batch"],
         cos_lr=params["cos_lr"],
