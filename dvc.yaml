@@ -35,7 +35,7 @@ stages:
     cmd:
       - >-
         uv run python ./scripts/model/yolo/train.py
-        --data ./data/03_model_input/yolo_train_val/data.yaml
+        --data ./data/03_model_input/yolo_train_val_small/datasets/data.yaml
         --config ./scripts/model/yolo/configs/best.yaml
         --output-dir ./data/04_models/yolo/
         --experiment-name best
