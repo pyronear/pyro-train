@@ -43,9 +43,9 @@ stages:
     outs:
     - path: ./data/04_models/yolo/baseline
       hash: md5
-      md5: e862b53bf715350935a1e019f208a1a5.dir
-      size: 12009100
-      nfiles: 22
+      md5: c8bdeb2a6cc6056e90d8953e00be7ff4.dir
+      size: 11861735
+      nfiles: 21
   train_yolo_best:
     cmd:
     - uv run python ./scripts/model/yolo/train.py --data ./data/03_model_input/yolo_train_val_small/datasets/data.yaml
@@ -59,7 +59,7 @@ stages:
       nfiles: 29630
     - path: ./scripts/model/yolo/configs/best.yaml
       hash: md5
-      md5: e7383fe50fd3c2a6fcab4153a55245ff
+      md5: 2475cb77ef8d43e05c370772e8b3a4e4
       size: 191
     - path: ./scripts/model/yolo/train.py
       hash: md5
@@ -68,8 +68,8 @@ stages:
     outs:
     - path: ./data/04_models/yolo/best
       hash: md5
-      md5: 30f23a8ca09792071c7d3fa5d7739b0d.dir
-      size: 39245616
+      md5: e1296658e7af2adc7d6599e1273a90b0.dir
+      size: 39243345
       nfiles: 21
   build_manifest_yolo_best:
     cmd:
@@ -78,8 +78,8 @@ stages:
     deps:
     - path: ./data/04_models/yolo/best/
       hash: md5
-      md5: 30f23a8ca09792071c7d3fa5d7739b0d.dir
-      size: 39245616
+      md5: e1296658e7af2adc7d6599e1273a90b0.dir
+      size: 39243345
       nfiles: 21
     - path: ./scripts/model/yolo/build_manifest.py
       hash: md5
@@ -88,8 +88,8 @@ stages:
     outs:
     - path: ./data/06_reporting/yolo/best/
       hash: md5
-      md5: b762102e5cf6cac16ec1c014ce667a7f.dir
-      size: 7431
+      md5: 251122fb2d6a941ba360b47ad55a5941.dir
+      size: 8177
       nfiles: 1
   export_yolo_best@onnx-cpu:
     cmd:
@@ -99,8 +99,8 @@ stages:
     deps:
     - path: ./data/04_models/yolo/best/
       hash: md5
-      md5: 30f23a8ca09792071c7d3fa5d7739b0d.dir
-      size: 39245616
+      md5: e1296658e7af2adc7d6599e1273a90b0.dir
+      size: 39243345
       nfiles: 21
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -109,7 +109,7 @@ stages:
     outs:
     - path: ./data/04_models/yolo-export/best/onnx/cpu
       hash: md5
-      md5: 52f96e2568a9fc1e256db9f8739acd8d.dir
+      md5: 0c941b0b220126734f7501dab9261e4b.dir
       size: 37804476
       nfiles: 1
   export_yolo_best@onnx-mps:
@@ -120,8 +120,8 @@ stages:
     deps:
     - path: ./data/04_models/yolo/best/
       hash: md5
-      md5: 30f23a8ca09792071c7d3fa5d7739b0d.dir
-      size: 39245616
+      md5: e1296658e7af2adc7d6599e1273a90b0.dir
+      size: 39243345
       nfiles: 21
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -130,7 +130,7 @@ stages:
     outs:
     - path: ./data/04_models/yolo-export/best/onnx/mps
       hash: md5
-      md5: fb5485a0fecdf18b3e8eb82f3b6049c6.dir
+      md5: d3c2ec7ad424a8667c09280f2d501bda.dir
       size: 37804476
       nfiles: 1
   export_yolo_best@ncnn-cpu:
@@ -141,8 +141,8 @@ stages:
     deps:
     - path: ./data/04_models/yolo/best/
       hash: md5
-      md5: 30f23a8ca09792071c7d3fa5d7739b0d.dir
-      size: 39245616
+      md5: e1296658e7af2adc7d6599e1273a90b0.dir
+      size: 39243345
       nfiles: 21
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -151,6 +151,27 @@ stages:
     outs:
     - path: ./data/04_models/yolo-export/best/ncnn/cpu
       hash: md5
-      md5: 088ffc4f21a83e66252ab5ea603febdb.dir
+      md5: 1484d3476e2cfa7d36c167a9f0cbdaed.dir
+      size: 37744786
+      nfiles: 5
+  export_yolo_best@ncnn-mps:
+    cmd:
+    - uv run python ./scripts/model/yolo/export.py --output-dir ./data/04_models/yolo-export/best/
+      --model-dir ./data/04_models/yolo/best/ --format ncnn --device mps --loglevel
+      info
+    deps:
+    - path: ./data/04_models/yolo/best/
+      hash: md5
+      md5: e1296658e7af2adc7d6599e1273a90b0.dir
+      size: 39243345
+      nfiles: 21
+    - path: ./scripts/model/yolo/export.py
+      hash: md5
+      md5: f802dc25c594eaccee9e83c02bd14cdd
+      size: 3648
+    outs:
+    - path: ./data/04_models/yolo-export/best/ncnn/mps
+      hash: md5
+      md5: 7e1519176d44d1085a2d0d7dab5676f8.dir
       size: 37744786
       nfiles: 5

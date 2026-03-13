@@ -1,6 +1,7 @@
 [core]
     analytics = false
     remote = pyronear-remote
+    autostage = true
 ['remote "remote_storage"']
     url = /tmp/dvc/pyronear_mlops/
 ['remote "pyronear-remote"']
