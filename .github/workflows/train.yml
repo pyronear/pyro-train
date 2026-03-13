@@ -83,6 +83,7 @@ jobs:
             --data ./data/test/yolo_test/data.yaml \
             --output-dir ./data/03_reporting/yolo/eval/ \
             --split test \
+            --iou 0.01 \
             --loglevel info
 
       - name: Commit eval results to result branch
