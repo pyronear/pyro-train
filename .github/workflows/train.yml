@@ -51,10 +51,6 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Pull dataset
-        run: |
-          uv run dvc pull data/03_model_input/yolo_train_val.dvc
-
       - name: Run pipeline
         run: uv run dvc repro
 
