@@ -16,15 +16,32 @@ from pyro_train.utils import resolve_device
 def resolve_data_yaml(data_yaml_path: Path) -> Path:
     """
     Rewrite a relative `path:` key in data.yaml to absolute so YOLO can find
-    images regardless of the working directory.
+    images regardless of the working directory. Also adds dummy `train` and
+    `val` keys (pointing to the test split) if missing, since Ultralytics
+    requires them even during test-only evaluation.
     """
     content = yaml_read(data_yaml_path)
-    if "path" not in content:
+    needs_patch = False
+
+    if "path" in content:
+        dataset_path = Path(content["path"])
+        if not dataset_path.is_absolute():
+            content["path"] = str((data_yaml_path.parent / dataset_path).resolve())
+            needs_patch = True
+
+    # Ultralytics requires 'train' and 'val' keys to be present
+    test_split = content.get("test")
+    if test_split is not None:
+        if "train" not in content:
+            content["train"] = test_split
+            needs_patch = True
+        if "val" not in content:
+            content["val"] = test_split
+            needs_patch = True
+
+    if not needs_patch:
         return data_yaml_path
-    dataset_path = Path(content["path"])
-    if dataset_path.is_absolute():
-        return data_yaml_path
-    content["path"] = str((data_yaml_path.parent / dataset_path).resolve())
+
     patched_path = data_yaml_path.parent / "_data.yaml"
     yaml_write(to=patched_path, data=content)
     return patched_path
