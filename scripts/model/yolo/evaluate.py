@@ -74,6 +74,12 @@ def make_cli_parser() -> argparse.ArgumentParser:
         type=str,
     )
     parser.add_argument(
+        "--iou",
+        help="IoU threshold for NMS during evaluation.",
+        default=0.7,
+        type=float,
+    )
+    parser.add_argument(
         "--device",
         help="device to use (cuda, mps, cpu). Defaults to best available.",
         default=None,
@@ -121,6 +127,7 @@ if __name__ == "__main__":
         data=str(data_yaml.absolute()),
         split=args["split"],
         device=device,
+        iou=args["iou"],
     )
 
     os.makedirs(args["output_dir"], exist_ok=True)

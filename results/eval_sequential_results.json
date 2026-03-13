@@ -1,0 +1,1479 @@
+{
+  "tp": 0,
+  "fn": 146,
+  "fp": 1,
+  "tn": 145,
+  "precision": 0.0,
+  "recall": 0.0,
+  "f1": null,
+  "fpr": 0.00684931506849315,
+  "conf_thresh": 0.15,
+  "nb_consecutive_frames": 8,
+  "max_frames": 15,
+  "model_path": "data/02_models/yolo-export/best/onnx/cpu/best.onnx",
+  "data_dir": "data/test/sequential_test",
+  "wildfire_sequences": [
+    {
+      "sequence": "awf-axis_elephant_999_2023-06-03T20-44-26",
+      "alerted": false,
+      "n_frames": 1
+    },
+    {
+      "sequence": "hpwren-figlib_hpnmoboc_999_2017-10-11T00-01-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_lpnmoboc_999_2020-06-11T20-38-01",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_lpsmoboc_999_2019-05-30T00-04-05",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_omemoboc_999_2020-11-05T23-17-37",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_omnmoboc_999_2020-08-07T03-36-35",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_omsmoboc_999_2020-12-08T22-28-39",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_pismoboc_999_2020-09-11T21-52-07",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_rmwmoboc_999_2019-08-29T19-49-06",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_smertcs8moboc_999_2018-05-04T23-41-55",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_smertcs9moboc_999_2019-10-01T20-10-58",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_smnmoboc_999_2020-12-16T22-35-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "hpwren-figlib_wcemoboc_999_2020-09-30T19-49-20",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-02-20T09-20-52",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-06-01T08-30-30",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-06-18T09-30-12",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_244_2024-04-10T10-49-22",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_244_2024-09-15T17-18-26",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_327_2024-01-08T07-43-15",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_327_2024-02-23T08-57-20",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_327_2024-02-27T08-20-51",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_080_2024-01-08T17-20-29",
+      "alerted": false,
+      "n_frames": 12
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_080_2024-02-15T10-45-47",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-01-02T12-11-00",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-01-15T13-18-47",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-01-24T11-28-08",
+      "alerted": false,
+      "n_frames": 1
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-01-28T15-52-37",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-02-18T10-10-30",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-02-19T09-15-52",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-02-27T16-51-36",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-08T09-41-20",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-12T11-49-32",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-15T13-07-49",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-16T09-18-09",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-29T10-02-24",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-30T15-05-34",
+      "alerted": false,
+      "n_frames": 2
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-31T10-58-50",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-01-31T12-45-24",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-02-01T10-12-16",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-02-02T09-30-13",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-02-07T10-23-35",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-02-13T13-52-19",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-02-15T09-05-13",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-02-23T10-06-13",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-04-03T11-07-23",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-04-09T15-11-23",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-04-20T09-30-22",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-04-22T09-29-15",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-09-13T08-43-35",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2024-01-22T15-00-30",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2024-01-28T12-20-34",
+      "alerted": false,
+      "n_frames": 12
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2024-02-04T15-22-24",
+      "alerted": false,
+      "n_frames": 3
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2024-04-08T19-22-42",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_142_2024-01-07T09-29-13",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_142_2024-01-14T16-43-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_142_2024-02-21T10-35-42",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_142_2024-02-24T10-46-16",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_142_2024-02-28T14-53-22",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_287_2023-10-26T08-47-07",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_287_2023-10-26T10-16-47",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_287_2024-01-20T13-48-41",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_067_2024-02-17T10-56-36",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_067_2024-02-29T15-55-39",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_138_2024-01-09T11-10-26",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_138_2024-01-20T10-45-55",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_138_2024-02-19T16-50-28",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_349_2024-01-09T11-59-58",
+      "alerted": false,
+      "n_frames": 13
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_349_2024-04-20T17-58-02",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_020_2024-01-31T11-21-38",
+      "alerted": false,
+      "n_frames": 12
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_020_2024-02-05T16-52-10",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_020_2024-03-17T15-25-17",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_020_2024-03-21T09-48-53",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_020_2024-06-22T15-23-07",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-01-26T11-17-30",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-02-04T10-44-26",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-02-05T08-41-46",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-02-06T14-02-36",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-02-23T14-21-25",
+      "alerted": false,
+      "n_frames": 12
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-03-17T12-11-28",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-03-28T11-29-59",
+      "alerted": false,
+      "n_frames": 3
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_127_2023-03-09T09-56-08",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_127_2023-06-03T08-03-14",
+      "alerted": false,
+      "n_frames": 1
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_127_2023-10-08T07-06-21",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_127_2023-10-16T07-07-31",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-04T15-32-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-19T09-37-34",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-21T13-00-57",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-23T13-40-33",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-23T15-15-05",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-24T10-32-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-25T15-33-23",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-26T15-25-00",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-02T09-47-06",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-02T11-16-37",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-02T14-48-14",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-03T12-34-29",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-07T12-17-23",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-07T12-56-54",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-12T17-04-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-13T15-18-47",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-16T14-31-50",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-20T18-22-05",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-04T17-35-32",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-14T16-44-53",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-15T16-04-43",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-16T15-33-34",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-17T17-08-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-19T09-06-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-28T14-42-08",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-07-04T08-48-01",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-10-31T13-42-50",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-01-26T10-12-31",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-02-08T08-01-11",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-02-24T14-48-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-03-07T13-27-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-03-16T10-22-31",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2023-08-27T10-05-05",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2023-09-17T16-49-47",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_39_2023-06-02T04-56-18",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-sdis-07_courmettes_160_2023-11-02T07-18-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_courmettes_212_2023-10-28T14-58-34",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-sdis-07_courmettes_212_2023-11-01T10-21-40",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_courmettes_275_2023-10-29T14-15-02",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_029_2024-01-15T15-47-46",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_029_2024-01-31T09-01-17",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_029_2024-03-17T12-14-47",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_029_2024-03-19T10-37-14",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_185_2024-01-26T10-50-48",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-02-01T09-16-06",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-02-13T15-35-14",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-03-19T16-28-57",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-06-08T15-46-03",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-02-15T16-35-51",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2023-04-16T00-23-26",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-02-21T16-48-53",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-02-29T15-33-02",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-03-18T13-21-19",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_serre-de-barre_160_2024-08-28T10-20-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_serre-de-barre_350_2024-08-23T11-09-34",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_008_2024-09-14T18-54-59",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_059_2024-09-01T20-56-15",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_059_2024-09-03T14-52-45",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_059_2024-09-22T13-38-36",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_161_2024-07-08T08-51-02",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_161_2024-09-12T09-47-14",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_265_2024-07-20T09-15-52",
+      "alerted": false,
+      "n_frames": 9
+    }
+  ],
+  "fp_sequences": [
+    {
+      "sequence": "pyronear-engie_salaunes-1_90_2023-09-30T11-25-04",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-engie_salaunes-2_0_2023-08-27T09-33-38",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-engie_salaunes-2_0_2023-09-22T09-24-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-engie_salaunes-2_0_2023-10-23T14-50-30",
+      "alerted": false,
+      "n_frames": 12
+    },
+    {
+      "sequence": "pyronear-engie_salaunes-2_0_2023-11-05T10-13-20",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-engie_salaunes-2_270_2025-05-16T12-05-04",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2023-10-10T10-41-19",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-06-10T13-22-13",
+      "alerted": false,
+      "n_frames": 13
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-06-22T05-20-29",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-06-23T17-09-18",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-08-06T16-06-28",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-08-25T16-48-37",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-08-26T13-46-25",
+      "alerted": false,
+      "n_frames": 12
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_125_2024-09-16T10-56-03",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_244_2023-10-13T07-18-36",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_244_2024-06-17T07-22-58",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_244_2024-06-23T09-52-06",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_244_2024-06-25T10-26-26",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_244_2024-07-21T16-17-24",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_291_2023-10-12T11-32-37",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_291_2023-10-15T12-58-54",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_291_2023-10-22T10-06-18",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_327_2024-06-24T13-09-30",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_327_2024-06-27T11-23-32",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_327_2024-07-05T09-45-54",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_327_2024-07-08T13-25-06",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_46_2023-10-06T10-00-20",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_46_2023-10-10T08-36-39",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-force-06_cabanelle_46_2023-10-22T12-39-13",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2023-10-20T10-30-37",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2023-10-20T16-52-20",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2023-10-24T08-05-05",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-06-26T15-44-52",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-06-26T18-16-24",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_160_2024-07-05T19-53-20",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2023-10-12T07-16-14",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2023-10-24T08-24-40",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2023-11-05T08-53-36",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2023-11-05T09-00-37",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_212_2024-06-24T17-47-34",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2023-10-12T06-55-18",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2023-10-25T11-18-15",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2024-06-08T15-39-32",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2024-06-17T07-50-55",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_275_2024-06-25T19-58-21",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_80_2024-06-24T17-11-55",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_courmettes_80_2024-09-06T07-57-07",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_204_2023-10-20T13-21-46",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_60_2023-10-19T11-18-35",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_60_2023-10-19T14-09-12",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_60_2023-10-19T15-52-45",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_60_2023-10-24T11-07-31",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-force-06_ferion_60_2023-10-24T13-05-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_138_2023-10-18T08-32-07",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_223_2023-10-19T07-46-58",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_223_2024-07-09T15-34-30",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_349_2023-11-02T12-25-04",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-force-06_valbonne_67_2023-10-31T13-43-58",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-03-19T08-15-22",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-06-15T12-11-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_110_2024-07-06T19-10-19",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_127_2023-09-16T16-05-14",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-01-03T15-16-36",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-02-26T13-37-30",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-03-10T06-43-41",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-06-05T08-45-51",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-06-15T05-39-09",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_200_2024-09-07T19-11-03",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_20_2024-01-02T15-40-40",
+      "alerted": false,
+      "n_frames": 13
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_20_2024-03-14T19-09-51",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_20_2024-09-08T18-00-53",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-07-28T06-38-05",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-09-21T12-53-03",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-09-22T05-26-40",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-10-07T17-24-14",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-10-15T15-01-52",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_226_2023-10-24T09-19-01",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-01-15T08-43-32",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-02-25T07-19-36",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-03-01T13-48-28",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-06-15T12-14-05",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_290_2024-06-24T06-12-02",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2023-06-13T15-50-21",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2023-09-13T16-51-13",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2023-09-16T18-00-58",
+      "alerted": false,
+      "n_frames": 13
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2023-11-02T16-00-06",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2023-11-05T06-44-14",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_311_2025-05-21T08-31-54",
+      "alerted": false,
+      "n_frames": 6
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_39_2023-08-27T06-33-27",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-07_brison_39_2023-09-16T16-54-21",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_185_2023-10-31T11-01-44",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_185_2024-02-26T17-02-02",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_185_2024-03-27T11-54-04",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2023-06-13T10-12-57",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2023-07-04T05-16-23",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2023-10-25T05-49-31",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-01-03T08-17-06",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-03-14T17-09-06",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-03-23T17-16-19",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-07-07T18-18-34",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_282_2024-07-12T12-46-49",
+      "alerted": false,
+      "n_frames": 9
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-06-08T04-42-02",
+      "alerted": false,
+      "n_frames": 4
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-08-26T11-47-41",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-09-18T05-17-45",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-09-18T07-26-24",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-17T14-33-14",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-17T15-47-48",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-19T07-37-38",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-19T12-58-18",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-19T14-01-51",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-20T14-58-37",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-20T15-37-36",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-20T15-50-07",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-23T15-17-32",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2023-10-29T10-18-43",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-01-10T10-02-46",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-01-18T15-30-06",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-02-26T09-05-59",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-03-11T08-04-34",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-06-29T20-44-02",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-07-12T09-55-45",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2024-09-08T20-09-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_29_2025-05-05T11-59-18",
+      "alerted": false,
+      "n_frames": 10
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2023-06-14T04-00-11",
+      "alerted": false,
+      "n_frames": 14
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2023-10-12T09-38-10",
+      "alerted": true,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2023-10-25T10-17-49",
+      "alerted": false,
+      "n_frames": 5
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2023-10-30T15-23-10",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-01-27T09-10-29",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-02-26T15-27-25",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-06-14T14-59-36",
+      "alerted": false,
+      "n_frames": 12
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-09-08T11-32-25",
+      "alerted": false,
+      "n_frames": 7
+    },
+    {
+      "sequence": "pyronear-sdis-07_marguerite_339_2024-09-20T07-42-09",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-07_serre-de-barre_150_2024-09-22T11-35-39",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_serre-de-barre_150_2024-09-22T16-03-59",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_serre-de-barre_257_2024-09-07T16-25-50",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-07_serre-de-barre_310_2024-08-26T19-20-15",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-12_pouncho-agast_112_2024-08-23T07-36-21",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-12_pouncho-agast_136_2024-09-08T09-27-10",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-12_pouncho-agast_218_2024-08-15T19-23-17",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-12_pouncho-agast_254_2024-09-04T10-42-27",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-12_pouncho-agast_30_2024-09-04T11-05-06",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-12_pouncho-agast_337_2024-09-03T11-15-43",
+      "alerted": false,
+      "n_frames": 15
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_8_2024-07-07T00-01-12",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-sdis-77_croix-augas_8_2024-07-12T11-31-35",
+      "alerted": false,
+      "n_frames": 11
+    },
+    {
+      "sequence": "pyronear-test_st-peray_251_2023-07-30T11-10-23",
+      "alerted": false,
+      "n_frames": 8
+    },
+    {
+      "sequence": "pyronear-test_st-peray_322_2023-07-26T12-50-24",
+      "alerted": false,
+      "n_frames": 6
+    }
+  ]
+}

@@ -13,6 +13,9 @@ dependencies = [
     "onnx>=1.18.0",
     "onnxruntime>=1.22.0",
     "onnxslim>=0.1.71",
+    "tqdm>=4.66.0",
+    "pyroengine @ git+https://github.com/pyronear/pyro-engine.git",
+    "pyroclient @ git+https://github.com/pyronear/pyro-api.git#subdirectory=client",
 ]
 
 [dependency-groups]
@@ -30,3 +33,6 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
