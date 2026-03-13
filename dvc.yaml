@@ -50,6 +50,19 @@ stages:
     outs:
       - ./data/03_reporting/yolo/best/
 
+  fetch_sequential_val:
+    cmd:
+      - >-
+        uv run dvc get https://github.com/pyronear/pyro-dataset
+        data/processed/sequential_train_val/val --rev v2.0.0
+        --out ./data/01_model_input/sequential_train_val/val
+        ||
+        uv run dvc get git@github.com:pyronear/pyro-dataset.git
+        data/processed/sequential_train_val/val --rev v2.0.0
+        --out ./data/01_model_input/sequential_train_val/val
+    outs:
+      - ./data/01_model_input/sequential_train_val/val
+
   export_yolo_best:
     matrix:
       format: [onnx, ncnn]
@@ -67,3 +80,19 @@ stages:
       - ./data/02_models/yolo/best/
     outs:
       - ./data/02_models/yolo-export/best/${item.format}/${item.device}
+
+  evaluate_sequential_yolo_best:
+    cmd:
+      - >-
+        uv run python ./scripts/model/yolo/evaluate_sequential.py
+        --model-path ./data/02_models/yolo-export/best/onnx/cpu/best.onnx
+        --data-dir ./data/01_model_input/sequential_train_val/val
+        --output-dir ./data/03_reporting/yolo/sequential/best/
+        --max-frames 15
+        --loglevel info
+    deps:
+      - ./scripts/model/yolo/evaluate_sequential.py
+      - ./data/02_models/yolo-export/best/onnx/cpu
+      - ./data/01_model_input/sequential_train_val/val
+    outs:
+      - ./data/03_reporting/yolo/sequential/best/
