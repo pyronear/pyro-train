@@ -49,7 +49,10 @@ jobs:
           aws-region: eu-west-3
 
       - name: Install dependencies
-        run: uv sync
+        run: |
+          uv sync
+          uv pip uninstall onnxruntime onnxruntime-gpu 2>/dev/null || true
+          uv pip install onnxruntime-gpu==1.22.1
 
       - name: Run pipeline
         run: uv run dvc repro
@@ -91,11 +94,6 @@ jobs:
           uv run dvc get https://github.com/pyronear/pyro-dataset \
             data/processed/sequential_test/test --rev v2.0.0 \
             --out ./data/test/sequential_test
-
-      - name: Install onnxruntime-gpu for CUDA inference
-        run: |
-          uv pip uninstall onnxruntime onnxruntime-gpu 2>/dev/null || true
-          uv pip install onnxruntime-gpu==1.22.1
 
       - name: Run sequential evaluation
         run: |

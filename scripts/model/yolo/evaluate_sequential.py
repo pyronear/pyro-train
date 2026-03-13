@@ -48,7 +48,6 @@ for _name, _mod in (
 ):
     sys.modules.setdefault(_name, _mod)
 
-import onnxruntime  # noqa: E402
 from PIL import Image  # noqa: E402
 from pyroengine.engine import Engine  # noqa: E402
 from tqdm import tqdm  # noqa: E402
@@ -78,10 +77,9 @@ def reset_state(engine: Engine, cam_key: str) -> None:
     engine.occlusion_masks[cam_key] = (None, {}, 0)  # noqa: SLF001
 
 
-def evaluate_sequence(engine: Engine, images_dir: Path, cam_key: str, max_frames: int) -> bool:
+def evaluate_sequence(engine: Engine, frames: list[Path], cam_key: str, max_frames: int) -> bool:
     """Return True if engine raised an alert on any frame in the sequence."""
     reset_state(engine, cam_key)
-    frames = sorted(images_dir.glob("*.jpg")) + sorted(images_dir.glob("*.png"))
     for frame_path in frames[:max_frames]:
         conf = engine.predict(Image.open(frame_path), cam_id=cam_key)
         if conf > engine.conf_thresh:
@@ -98,8 +96,8 @@ def evaluate_category(engine: Engine, category_dir: Path, label: str, max_frames
             if not images_dir.exists():
                 logger.warning(f"No images/ folder in {seq_dir}, skipping")
                 continue
-            frames = list(images_dir.glob("*.jpg")) + list(images_dir.glob("*.png"))
-            alerted = evaluate_sequence(engine, images_dir, seq_dir.name, max_frames)
+            frames = sorted(images_dir.glob("*.jpg")) + sorted(images_dir.glob("*.png"))
+            alerted = evaluate_sequence(engine, frames, seq_dir.name, max_frames)
             records.append({"sequence": seq_dir.name, "alerted": alerted, "n_frames": min(len(frames), max_frames)})
             pbar.set_postfix({"last": seq_dir.name[:30], "alert": alerted})
     return records
@@ -182,17 +180,7 @@ if __name__ == "__main__":
         nb_consecutive_frames=args["nb_consecutive_frames"],
         cache_folder=str(args["output_dir"]),
     )
-
-    # Upgrade to CUDA execution provider if available (requires onnxruntime-gpu).
-    available_providers = onnxruntime.get_available_providers()
-    if "CUDAExecutionProvider" in available_providers:
-        engine.model.ort_session = onnxruntime.InferenceSession(  # noqa: SLF001
-            str(args["model_path"]),
-            providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
-        )
-        logger.info("onnxruntime: using CUDAExecutionProvider")
-    else:
-        logger.info(f"onnxruntime: CUDA not available, using {available_providers[0]}")
+    # Provider selection (CUDA → CoreML → CPU) is now handled inside pyroengine's Classifier.
 
     wf_records = evaluate_category(engine, args["data_dir"] / "wildfire", "wildfire", args["max_frames"])
     fp_records = evaluate_category(engine, args["data_dir"] / "fp", "fp     ", args["max_frames"])

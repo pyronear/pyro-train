@@ -5,7 +5,7 @@ epochs: 2
 patience: 20
 batch: 16
 imgsz: 64
-lr0: 0.0002
+lr0: 0.0001
 lrf: 0.1
 optimizer: AdamW
 mixup: 0.2
