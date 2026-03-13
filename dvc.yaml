@@ -5,73 +5,73 @@ stages:
       - >-
         uv run dvc get https://github.com/pyronear/pyro-dataset
         data/processed/yolo_train_val --rev v2.0.0
-        --out ./data/03_model_input/yolo_train_val
+        --out ./data/01_model_input/yolo_train_val
         ||
         uv run dvc get git@github.com:pyronear/pyro-dataset.git
         data/processed/yolo_train_val --rev v2.0.0
-        --out ./data/03_model_input/yolo_train_val
+        --out ./data/01_model_input/yolo_train_val
     outs:
-      - ./data/03_model_input/yolo_train_val
+      - ./data/01_model_input/yolo_train_val
 
   subsample_model_input:
     cmd:
       - >-
         uv run python ./scripts/data/model_input/build.py
-        --input-dir ./data/03_model_input/yolo_train_val
-        --output-dir ./data/03_model_input/yolo_train_val_small
+        --input-dir ./data/01_model_input/yolo_train_val
+        --output-dir ./data/01_model_input/yolo_train_val_small
         --sampling-ratio 0.05
         --random-seed 0
         --loglevel info
     deps:
       - ./scripts/data/model_input/build.py
-      - ./data/03_model_input/yolo_train_val
+      - ./data/01_model_input/yolo_train_val
     outs:
-      - ./data/03_model_input/yolo_train_val_small
+      - ./data/01_model_input/yolo_train_val_small
 
   train_yolo_baseline:
     cmd:
       - >-
         uv run python ./scripts/model/yolo/train.py
-        --data ./data/03_model_input/yolo_train_val_small/datasets/data.yaml
+        --data ./data/01_model_input/yolo_train_val_small/datasets/data.yaml
         --config ./scripts/model/yolo/configs/baseline.yaml
-        --output-dir ./data/04_models/yolo/
+        --output-dir ./data/02_models/yolo/
         --experiment-name baseline
         --loglevel info
     deps:
       - ./scripts/model/yolo/train.py
       - ./scripts/model/yolo/configs/baseline.yaml
-      - ./data/03_model_input/yolo_train_val_small/
+      - ./data/01_model_input/yolo_train_val_small/
     outs:
-      - ./data/04_models/yolo/baseline
+      - ./data/02_models/yolo/baseline
 
   train_yolo_best:
     cmd:
       - >-
         uv run python ./scripts/model/yolo/train.py
-        --data ./data/03_model_input/yolo_train_val_small/datasets/data.yaml
+        --data ./data/01_model_input/yolo_train_val_small/datasets/data.yaml
         --config ./scripts/model/yolo/configs/best.yaml
-        --output-dir ./data/04_models/yolo/
+        --output-dir ./data/02_models/yolo/
         --experiment-name best
         --loglevel info
     deps:
       - ./scripts/model/yolo/train.py
       - ./scripts/model/yolo/configs/best.yaml
-      - ./data/03_model_input/yolo_train_val_small/
+      - ./data/01_model_input/yolo_train_val_small/
     outs:
-      - ./data/04_models/yolo/best
+      - ./data/02_models/yolo/best
 
   build_manifest_yolo_best:
     cmd:
       - >-
         uv run python ./scripts/model/yolo/build_manifest.py
-        --save-dir ./data/06_reporting/yolo/best/
-        --dir-model ./data/04_models/yolo/best/
+        --save-dir ./data/03_reporting/yolo/best/
+        --dir-model ./data/02_models/yolo/best/
         --loglevel info
     deps:
       - ./scripts/model/yolo/build_manifest.py
-      - ./data/04_models/yolo/best/
+      - ./data/02_models/yolo/best/
     outs:
-      - ./data/06_reporting/yolo/best/
+      - ./data/03_reporting/yolo/best/
 
   export_yolo_best:
     matrix:
@@ -80,13 +80,13 @@ stages:
     cmd:
       - >-
         uv run python ./scripts/model/yolo/export.py
-        --output-dir ./data/04_models/yolo-export/best/
-        --model-dir ./data/04_models/yolo/best/
+        --output-dir ./data/02_models/yolo-export/best/
+        --model-dir ./data/02_models/yolo/best/
         --format ${item.format}
         --device ${item.device}
         --loglevel info
     deps:
       - ./scripts/model/yolo/export.py
-      - ./data/04_models/yolo/best/
+      - ./data/02_models/yolo/best/
     outs:
-      - ./data/04_models/yolo-export/best/${item.format}/${item.device}
+      - ./data/02_models/yolo-export/best/${item.format}/${item.device}

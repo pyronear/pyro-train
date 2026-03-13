@@ -20,13 +20,13 @@ def make_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--model-dir",
         help="directory that contains the result of the ultralytics training of the model",
-        default="./data/04_models/yolo/best/",
+        default="./data/02_models/yolo/best/",
         type=Path,
     )
     parser.add_argument(
         "--output-dir",
         help="path to save the model_artifacts",
-        default="./data/04_models/yolo-export/best/",
+        default="./data/02_models/yolo-export/best/",
         type=Path,
     )
     parser.add_argument(

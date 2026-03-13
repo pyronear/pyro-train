@@ -20,13 +20,13 @@ def make_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--input-dir",
         help="path pointing to the raw dataset",
-        default="./data/01_raw/wildfire",
+        default="./data/01_model_input/wildfire",
         type=Path,
     )
     parser.add_argument(
         "--output-dir",
         help="path to save the model_input",
-        default="./data/03_model_input/wildfire",
+        default="./data/01_model_input/wildfire",
         type=Path,
     )
     parser.add_argument(

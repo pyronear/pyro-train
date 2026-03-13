@@ -24,14 +24,14 @@ def make_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--data",
         help="filepath to the data_yaml config file for the dataset",
-        default="./data/03_model_input/yolo/small/datasets/data.yaml",
+        default="./data/01_model_input/yolo/small/datasets/data.yaml",
         type=Path,
         required=True,
     )
     parser.add_argument(
         "--output-dir",
         help="path to save the model_artifacts",
-        default="./data/04_models/yolo/",
+        default="./data/02_models/yolo/",
         type=Path,
         required=True,
     )

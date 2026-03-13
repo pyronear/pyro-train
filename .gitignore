@@ -4,9 +4,9 @@ yolov*.pt
 yolo*.pt
 __pycache__
 runs
-data/04_models/yolo*/random_hyperparameter_search_*
-data/04_models/yolo*/wildfire_bench_*
-data/06_reporting/yolo*/
+data/02_models/yolo*/random_hyperparameter_search_*
+data/02_models/yolo*/wildfire_bench_*
+data/03_reporting/yolo*/
 
 **.DS_Store
 **/_data.yaml

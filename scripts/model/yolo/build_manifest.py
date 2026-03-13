@@ -19,13 +19,13 @@ def make_cli_parser() -> argparse.ArgumentParser:
         "--save-dir",
         help="directory to save the manifest.",
         type=Path,
-        default=Path("./data/06_reporting/yolo/best/"),
+        default=Path("./data/03_reporting/yolo/best/"),
     )
     parser.add_argument(
         "--dir-model",
         help="directory pointing to the yolo model.",
         type=Path,
-        default=Path("./data/04_models/yolo/best/"),
+        default=Path("./data/02_models/yolo/best/"),
     )
     parser.add_argument(
         "-log",
@@ -56,8 +56,6 @@ def make_data_manifest(dir_model: Path) -> dict:
     filepath_args = dir_model / "args.yaml"
     sha256_weights = compute_file_content_sha256(filepath_weights)
     args_model_train_run = yaml_read(filepath_args)
-    filepath_raw_wildfire_dvc = Path("./data/01_raw/wildfire.dvc")
-    raw_wildfire_dvc = yaml_read(filepath_raw_wildfire_dvc)
     data_yaml = Path(args_model_train_run["data"]).relative_to(Path(".").absolute())
     filepath_dvc_lock = Path("./dvc.lock")
     dvc_lock = yaml_read(filepath_dvc_lock)
@@ -72,7 +70,7 @@ def make_data_manifest(dir_model: Path) -> dict:
         },
         "data": {
             "data_yaml": str(data_yaml),
-            "dvc": raw_wildfire_dvc["outs"][0],
+            "dvc": dict(dvc_lock["stages"]["fetch_model_input"]["outs"][0]),
         },
         "train_run_args": args_model_train_run,
         "dvc_lock": dvc_lock,

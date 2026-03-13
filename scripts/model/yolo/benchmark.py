@@ -20,13 +20,13 @@ def make_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--input-dir",
         help="root directory containing YOLO train runs.",
-        default="./data/04_models/yolo/",
+        default="./data/02_models/yolo/",
         type=Path,
     )
     parser.add_argument(
         "--output-dir",
         help="path to save the benchmark.",
-        default="./data/06_reporting/yolo/",
+        default="./data/03_reporting/yolo/",
         type=Path,
     )
     parser.add_argument(
