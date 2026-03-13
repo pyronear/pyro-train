@@ -162,7 +162,9 @@ def validate_parsed_args(args: dict) -> bool:
 if __name__ == "__main__":
     cli_parser = make_cli_parser()
     args = vars(cli_parser.parse_args())
-    logging.basicConfig(level=args["loglevel"].upper())
+    # basicConfig is a no-op here (pyroengine already installed handlers with force=True).
+    # Set the root level directly instead so --loglevel is respected.
+    logging.getLogger().setLevel(args["loglevel"].upper())
 
     if not validate_parsed_args(args):
         exit(1)
