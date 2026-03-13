@@ -52,7 +52,7 @@ jobs:
         run: |
           uv sync
           uv pip uninstall onnxruntime onnxruntime-gpu 2>/dev/null || true
-          uv pip install onnxruntime-gpu==1.22.1
+          uv pip install onnxruntime-gpu
 
       - name: Run pipeline
         run: uv run dvc repro
