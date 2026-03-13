@@ -70,6 +70,73 @@ jobs:
           git commit -m "chore: training results from $BRANCH_NAME [skip ci]"
           git push origin "$RESULT_BRANCH"
 
+      - name: Download test dataset
+        run: |
+          uv run dvc get https://github.com/pyronear/pyro-dataset \
+            data/processed/yolo_test --rev v2.0.0 \
+            --out ./data/test/yolo_test
+
+      - name: Run evaluation
+        run: |
+          uv run python ./scripts/model/yolo/evaluate.py \
+            --model-dir ./data/02_models/yolo/best \
+            --data ./data/test/yolo_test/data.yaml \
+            --output-dir ./data/03_reporting/yolo/eval/ \
+            --split test \
+            --loglevel info
+
+      - name: Install gh CLI
+        run: |
+          if ! which gh > /dev/null 2>&1; then
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+              | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+              | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y gh
+          fi
+
+      - name: Open PR and publish metrics
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
+
+          RESULTS=./data/03_reporting/yolo/eval/eval_results.json
+          MAP50=$(uv run python -c "import json; print(f\"{json.load(open('$RESULTS'))['map50']:.4f}\")")
+          MAP5095=$(uv run python -c "import json; print(f\"{json.load(open('$RESULTS'))['map50_95']:.4f}\")")
+          PRECISION=$(uv run python -c "import json; print(f\"{json.load(open('$RESULTS'))['precision']:.4f}\")")
+          RECALL=$(uv run python -c "import json; print(f\"{json.load(open('$RESULTS'))['recall']:.4f}\")")
+
+          BODY=$(cat <<EOF
+          ## Evaluation results on test set
+
+          | Metric | Value |
+          |--------|-------|
+          | mAP@50 | $MAP50 |
+          | mAP@50-95 | $MAP5095 |
+          | Precision | $PRECISION |
+          | Recall | $RECALL |
+
+          **Branch:** \`$RESULT_BRANCH\`
+          **Test dataset:** pyronear/pyro-dataset @ v2.0.0
+          EOF
+          )
+
+          PR_NUMBER=$(gh pr list --head "$RESULT_BRANCH" --base main --json number --jq '.[0].number')
+
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" = "null" ]; then
+            gh pr create \
+              --base main \
+              --head "$RESULT_BRANCH" \
+              --title "Training results: $RESULT_BRANCH" \
+              --body "$BODY"
+          else
+            gh pr comment "$PR_NUMBER" --body "$BODY"
+          fi
+
   stop-runner:
     name: Stop EC2 GPU runner
     needs: [start-runner, train]
