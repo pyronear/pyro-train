@@ -2351,6 +2351,7 @@ dependencies = [
     { name = "pnnx" },
     { name = "pyroclient" },
     { name = "pyroengine" },
+    { name = "tqdm" },
     { name = "ultralytics" },
 ]
 
@@ -2376,6 +2377,7 @@ requires-dist = [
     { name = "pnnx", specifier = ">=1.0.20250503" },
     { name = "pyroclient", git = "https://github.com/pyronear/pyro-api.git?subdirectory=client" },
     { name = "pyroengine", git = "https://github.com/pyronear/pyro-engine.git" },
+    { name = "tqdm", specifier = ">=4.66.0" },
     { name = "ultralytics", specifier = "==8.4.21" },
 ]
 
