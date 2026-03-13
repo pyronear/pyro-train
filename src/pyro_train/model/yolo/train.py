@@ -56,7 +56,7 @@ def train(
     }
     params = {**default_params, **params}
     model.train(
-        project=project,
+        project=str(Path(project).resolve()),
         name=experiment_name,
         data=data_yaml_path.absolute(),
         device=device,
