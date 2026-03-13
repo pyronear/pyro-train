@@ -48,13 +48,20 @@ for _name, _mod in (
 ):
     sys.modules.setdefault(_name, _mod)
 
+import onnxruntime  # noqa: E402
 from PIL import Image  # noqa: E402
 from pyroengine.engine import Engine  # noqa: E402
 from tqdm import tqdm  # noqa: E402
 
 # pyroengine calls logging.basicConfig(force=True, level=INFO) at import time,
-# resetting the root logger. Override the root level immediately after.
+# resetting the root logger. Pin root to WARNING permanently so pyroengine's
+# per-frame INFO spam is always suppressed, regardless of --loglevel.
 logging.getLogger().setLevel(logging.WARNING)
+
+# Named logger for this script – level is set from --loglevel in __main__.
+logger = logging.getLogger("pyro_eval")
+logger.addHandler(logging.StreamHandler())
+logger.propagate = False
 
 
 def reset_state(engine: Engine, cam_key: str) -> None:
@@ -89,7 +96,7 @@ def evaluate_category(engine: Engine, category_dir: Path, label: str, max_frames
         for seq_dir in pbar:
             images_dir = seq_dir / "images"
             if not images_dir.exists():
-                logging.warning(f"No images/ folder in {seq_dir}, skipping")
+                logger.warning(f"No images/ folder in {seq_dir}, skipping")
                 continue
             frames = list(images_dir.glob("*.jpg")) + list(images_dir.glob("*.png"))
             alerted = evaluate_sequence(engine, images_dir, seq_dir.name, max_frames)
@@ -147,14 +154,14 @@ def make_cli_parser() -> argparse.ArgumentParser:
 
 def validate_parsed_args(args: dict) -> bool:
     if not args["model_path"].exists():
-        logging.error(f"--model-path not found: {args['model_path']}")
+        logger.error(f"--model-path not found: {args['model_path']}")
         return False
     if not args["data_dir"].exists():
-        logging.error(f"--data-dir not found: {args['data_dir']}")
+        logger.error(f"--data-dir not found: {args['data_dir']}")
         return False
     for split in ("wildfire", "fp"):
         if not (args["data_dir"] / split).exists():
-            logging.error(f"Expected subfolder '{split}' not found in {args['data_dir']}")
+            logger.error(f"Expected subfolder '{split}' not found in {args['data_dir']}")
             return False
     return True
 
@@ -162,9 +169,7 @@ def validate_parsed_args(args: dict) -> bool:
 if __name__ == "__main__":
     cli_parser = make_cli_parser()
     args = vars(cli_parser.parse_args())
-    # basicConfig is a no-op here (pyroengine already installed handlers with force=True).
-    # Set the root level directly instead so --loglevel is respected.
-    logging.getLogger().setLevel(args["loglevel"].upper())
+    logger.setLevel(args["loglevel"].upper())
 
     if not validate_parsed_args(args):
         exit(1)
@@ -177,6 +182,17 @@ if __name__ == "__main__":
         nb_consecutive_frames=args["nb_consecutive_frames"],
         cache_folder=str(args["output_dir"]),
     )
+
+    # Upgrade to CUDA execution provider if available (requires onnxruntime-gpu).
+    available_providers = onnxruntime.get_available_providers()
+    if "CUDAExecutionProvider" in available_providers:
+        engine.model.ort_session = onnxruntime.InferenceSession(  # noqa: SLF001
+            str(args["model_path"]),
+            providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
+        )
+        logger.info("onnxruntime: using CUDAExecutionProvider")
+    else:
+        logger.info(f"onnxruntime: CUDA not available, using {available_providers[0]}")
 
     wf_records = evaluate_category(engine, args["data_dir"] / "wildfire", "wildfire", args["max_frames"])
     fp_records = evaluate_category(engine, args["data_dir"] / "fp", "fp     ", args["max_frames"])

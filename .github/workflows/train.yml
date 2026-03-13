@@ -92,6 +92,9 @@ jobs:
             data/processed/sequential_test/test --rev v2.0.0 \
             --out ./data/test/sequential_test
 
+      - name: Install onnxruntime-gpu for CUDA inference
+        run: uv pip install onnxruntime-gpu==1.22.1
+
       - name: Run sequential evaluation
         run: |
           uv run python ./scripts/model/yolo/evaluate_sequential.py \
