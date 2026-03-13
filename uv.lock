@@ -2349,6 +2349,8 @@ dependencies = [
     { name = "onnxslim" },
     { name = "pandas" },
     { name = "pnnx" },
+    { name = "pyroclient" },
+    { name = "pyroengine" },
     { name = "ultralytics" },
 ]
 
@@ -2372,6 +2374,8 @@ requires-dist = [
     { name = "onnxslim", specifier = ">=0.1.71" },
     { name = "pandas", specifier = ">=2.2.2,<3" },
     { name = "pnnx", specifier = ">=1.0.20250503" },
+    { name = "pyroclient", git = "https://github.com/pyronear/pyro-api.git?subdirectory=client" },
+    { name = "pyroengine", git = "https://github.com/pyronear/pyro-engine.git" },
     { name = "ultralytics", specifier = "==8.4.21" },
 ]
 
@@ -2386,6 +2390,19 @@ dev = [
     { name = "pytest", specifier = ">=8.3.5,<9" },
     { name = "ruff", specifier = ">=0.12.7" },
 ]
+
+[[package]]
+name = "pyroclient"
+version = "0.2.0.dev0"
+source = { git = "https://github.com/pyronear/pyro-api.git?subdirectory=client#ea8924ff962a339f2a3e329243b7d168f459914b" }
+dependencies = [
+    { name = "requests" },
+]
+
+[[package]]
+name = "pyroengine"
+version = "3.0.0"
+source = { git = "https://github.com/pyronear/pyro-engine.git#e2a6de993902cd589de031792fbfe27a898e73c1" }
 
 [[package]]
 name = "pytest"
