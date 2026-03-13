@@ -18,7 +18,8 @@ The Data pipeline is organized with a [dvc.yaml](./dvc.yaml) file.
 This section list and describes all the DVC stages that are defined in the
 [dvc.yaml](./dvc.yaml) file:
 
-- __subsample_model_input__: Sample 5% of the imported `yolo_train_val` dataset for fast iteration.
+- __fetch_model_input__: Download the `yolo_train_val` dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v2.0.0`.
+- __subsample_model_input__: Sample 5% of the fetched `yolo_train_val` dataset for fast iteration.
 - __train_yolo_baseline__: Train a YOLO baseline model on the 5% subsampled dataset.
 - __train_yolo_best__: Train the best YOLO model on the full dataset.
 - __build_manifest_yolo_best__: Build the manifest.yaml file to attach with the model.
@@ -48,20 +49,20 @@ source .venv/bin/activate
 
 ### Data Dependencies
 
-The dataset is imported directly from [pyro-dataset](https://github.com/pyronear/pyro-dataset)
-via DVC — no manual download needed. Pull the import:
+The dataset is fetched automatically from [pyro-dataset](https://github.com/pyronear/pyro-dataset)
+as the first stage of the pipeline — no AWS credentials needed. Just run:
 
 ```sh
-dvc pull data/03_model_input/yolo_train_val.dvc
+uv run dvc repro fetch_model_input
 ```
 
-For the full DVC remote (model artifacts), you need access to the Pyronear S3 remote,
+For model artifacts (weights, exports), you need access to the Pyronear S3 remote,
 reserved for Pyronear members. On request, you will be provided with AWS credentials.
 
-Pull all DVC-tracked files:
+Pull all other DVC-tracked files:
 
 ```sh
-dvc pull
+uv run dvc pull
 ```
 
 ![Random batch sample from the dataset](./docs/assets/images/batch.jpg)
@@ -102,7 +103,7 @@ conventions](https://docs.kedro.org/en/stable/faq/faq.html#what-is-data-engineer
 
 ### Library Code
 
-The library code is available under the `pyronear_mlops` folder.
+The library code is available under the `src/pyro_train/` folder.
 
 ### Scripts
 
@@ -118,13 +119,13 @@ reproducible. See `dvc.yaml`.
 To get an overview of the pipeline DAG:
 
 ```sh
-dvc dag
+uv run dvc dag
 ```
 
 To run the full pipeline:
 
 ```sh
-dvc repro
+uv run dvc repro
 ```
 
 ## MLFlow
