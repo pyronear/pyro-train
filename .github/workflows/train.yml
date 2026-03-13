@@ -68,7 +68,7 @@ jobs:
           git checkout -b "$RESULT_BRANCH"
           git add dvc.lock
           git commit -m "chore: training results from $BRANCH_NAME [skip ci]"
-          git push origin "$RESULT_BRANCH"
+          git push --force origin "$RESULT_BRANCH"
 
       - name: Download test dataset
         run: |
