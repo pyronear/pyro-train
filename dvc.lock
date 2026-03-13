@@ -75,8 +75,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo/best
       hash: md5
-      md5: fc2219b919223cf34a0b024bcdb654c7.dir
-      size: 39232833
+      md5: f40fe4b2f06dbefc74f7b389fc816a67.dir
+      size: 39238123
       nfiles: 21
   build_manifest_yolo_best:
     cmd:
@@ -85,8 +85,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: fc2219b919223cf34a0b024bcdb654c7.dir
-      size: 39232833
+      md5: f40fe4b2f06dbefc74f7b389fc816a67.dir
+      size: 39238123
       nfiles: 21
     - path: ./scripts/model/yolo/build_manifest.py
       hash: md5
@@ -95,8 +95,8 @@ stages:
     outs:
     - path: ./data/03_reporting/yolo/best/
       hash: md5
-      md5: 96e4013ffdc74ec628174f4347092193.dir
-      size: 9878
+      md5: 88f3edbd022380ba5b23dc91e4d2b777.dir
+      size: 11524
       nfiles: 1
   export_yolo_best@onnx-cpu:
     cmd:
@@ -106,8 +106,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: fc2219b919223cf34a0b024bcdb654c7.dir
-      size: 39232833
+      md5: f40fe4b2f06dbefc74f7b389fc816a67.dir
+      size: 39238123
       nfiles: 21
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -116,8 +116,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo-export/best/onnx/cpu
       hash: md5
-      md5: fa8ed3264897ab05955c9527935fd763.dir
-      size: 38418862
+      md5: f0875ff808350caba44f80d0102dd766.dir
+      size: 38358856
       nfiles: 1
   export_yolo_best@onnx-mps:
     cmd:
@@ -127,8 +127,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: fc2219b919223cf34a0b024bcdb654c7.dir
-      size: 39232833
+      md5: f40fe4b2f06dbefc74f7b389fc816a67.dir
+      size: 39238123
       nfiles: 21
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -137,8 +137,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo-export/best/onnx/mps
       hash: md5
-      md5: 0635e72b95d764670701468647ce7578.dir
-      size: 38848883
+      md5: ff911e2d82d4e2787888dc687a93f97a.dir
+      size: 38045684
       nfiles: 1
   export_yolo_best@ncnn-cpu:
     cmd:
@@ -148,8 +148,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: fc2219b919223cf34a0b024bcdb654c7.dir
-      size: 39232833
+      md5: f40fe4b2f06dbefc74f7b389fc816a67.dir
+      size: 39238123
       nfiles: 21
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -158,8 +158,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo-export/best/ncnn/cpu
       hash: md5
-      md5: 61be60598897bfa1c72f5cdc4e120b35.dir
-      size: 37744786
+      md5: a94fdcde80e2881b00873d90f7a11e71.dir
+      size: 37744782
       nfiles: 5
   export_yolo_best@ncnn-mps:
     cmd:
@@ -169,8 +169,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: fc2219b919223cf34a0b024bcdb654c7.dir
-      size: 39232833
+      md5: f40fe4b2f06dbefc74f7b389fc816a67.dir
+      size: 39238123
       nfiles: 21
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -179,8 +179,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo-export/best/ncnn/mps
       hash: md5
-      md5: 5f7e0746d1c9c46b858b321787528aea.dir
-      size: 37744786
+      md5: 947058d82b48553e4fb80fd634071387.dir
+      size: 37744782
       nfiles: 5
   fetch_model_input:
     cmd:
@@ -218,16 +218,16 @@ stages:
       nfiles: 12160
     - path: ./data/02_models/yolo-export/best/onnx/cpu
       hash: md5
-      md5: fa8ed3264897ab05955c9527935fd763.dir
-      size: 38418862
+      md5: f0875ff808350caba44f80d0102dd766.dir
+      size: 38358856
       nfiles: 1
     - path: ./scripts/model/yolo/evaluate_sequential.py
       hash: md5
-      md5: 8ed5fe91f8265302ef5a0eef3a2e21c4
-      size: 7984
+      md5: 7494a8ab99c9ae838066a6e11a574298
+      size: 8148
     outs:
     - path: ./data/03_reporting/yolo/sequential/best/
       hash: md5
-      md5: 96041692f971d92293cf0ceed7f18689.dir
-      size: 38270
+      md5: b983b43a6fba93e03877f7e6e415b792.dir
+      size: 38284
       nfiles: 1
