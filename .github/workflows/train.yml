@@ -86,12 +86,28 @@ jobs:
             --iou 0.01 \
             --loglevel info
 
+      - name: Download sequential test dataset
+        run: |
+          uv run dvc get https://github.com/pyronear/pyro-dataset \
+            data/processed/sequential_test/test --rev v2.0.0 \
+            --out ./data/test/sequential_test
+
+      - name: Run sequential evaluation
+        run: |
+          uv run python ./scripts/model/yolo/evaluate_sequential.py \
+            --model-path ./data/02_models/yolo-export/best/onnx/cpu/best.onnx \
+            --data-dir ./data/test/sequential_test \
+            --output-dir ./data/03_reporting/yolo/sequential/eval/ \
+            --max-frames 15 \
+            --loglevel info
+
       - name: Commit eval results to result branch
         run: |
           RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
           mkdir -p results
           cp ./data/03_reporting/yolo/eval/eval_results.json results/eval_results.json
-          git add results/eval_results.json
+          cp ./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json results/eval_sequential_results.json
+          git add results/eval_results.json results/eval_sequential_results.json
           git commit -m "chore: add eval results [skip ci]"
           git push origin "$RESULT_BRANCH"
 
@@ -114,19 +130,34 @@ jobs:
         run: |
           export RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
           export RESULTS=./data/03_reporting/yolo/eval/eval_results.json
+          export SEQ_RESULTS=./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json
 
           # Fetch baseline results from main (may not exist on first run)
           export BASELINE_JSON=$(git show origin/main:results/eval_results.json 2>/dev/null || echo "{}")
+          export BASELINE_SEQ_JSON=$(git show origin/main:results/eval_sequential_results.json 2>/dev/null || echo "{}")
 
           BODY=$(uv run python - <<'PYEOF'
-          import json, os, sys
+          import json, os
 
-          results_path = os.environ.get("RESULTS", "./data/03_reporting/yolo/eval/eval_results.json")
-          with open(results_path) as f:
+          with open(os.environ["RESULTS"]) as f:
               curr = json.load(f)
+          with open(os.environ["SEQ_RESULTS"]) as f:
+              seq = json.load(f)
 
           baseline_json = os.environ.get("BASELINE_JSON", "{}")
           prev = json.loads(baseline_json) if baseline_json.strip() != "{}" else None
+
+          baseline_seq_json = os.environ.get("BASELINE_SEQ_JSON", "{}")
+          prev_seq = json.loads(baseline_seq_json) if baseline_seq_json.strip() != "{}" else None
+
+          def fmt(v):
+              return f"{v:.4f}" if v is not None else "N/A"
+
+          def delta(curr_val, prev_val):
+              if prev_val is None or curr_val is None:
+                  return "n/a"
+              d = curr_val - prev_val
+              return f"{'+'if d>=0 else ''}{d:.4f}"
 
           metrics = [
               ("mAP@50",    "map50"),
@@ -134,24 +165,22 @@ jobs:
               ("Precision", "precision"),
               ("Recall",    "recall"),
           ]
-
-          def fmt(v):
-              return f"{v:.4f}"
-
-          def delta(key):
-              if prev and key in prev:
-                  d = curr[key] - prev[key]
-                  sign = "+" if d >= 0 else ""
-                  return f"{sign}{d:.4f}"
-              return "n/a"
-
-          def main_val(key):
-              return fmt(prev[key]) if prev and key in prev else "n/a"
-
           rows = "\n".join(
-              f"| {label} | {main_val(key)} | {fmt(curr[key])} | {delta(key)} |"
+              f"| {label} | {fmt(prev[key]) if prev and key in prev else 'n/a'} | {fmt(curr[key])} | {delta(curr[key], prev[key] if prev else None)} |"
               for label, key in metrics
           )
+
+          seq_metrics = [
+              ("Recall (TP rate)", "recall"),
+              ("FPR",              "fpr"),
+              ("F1",               "f1"),
+              ("Precision",        "precision"),
+          ]
+          seq_rows = "\n".join(
+              f"| {label} | {fmt(prev_seq[key]) if prev_seq and key in prev_seq else 'n/a'} | {fmt(seq[key])} | {delta(seq[key], prev_seq[key] if prev_seq else None)} |"
+              for label, key in seq_metrics
+          )
+          tp, fn, fp, tn = seq["tp"], seq["fn"], seq["fp"], seq["tn"]
 
           baseline_note = "_(no baseline on main yet)_" if prev is None else "_(vs last committed results on main)_"
 
@@ -160,6 +189,14 @@ jobs:
           | Metric | main | current | Δ |
           |--------|------|---------|---|
           {rows}
+
+          ## Sequential evaluation (engine, max {seq['max_frames']} frames/seq)
+
+          TP={tp} FN={fn} FP={fp} TN={tn}
+
+          | Metric | main | current | Δ |
+          |--------|------|---------|---|
+          {seq_rows}
 
           {baseline_note}
           **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v2.0.0""")
