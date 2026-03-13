@@ -286,7 +286,7 @@ if __name__ == "__main__":
         release_id = response_release["id"]
         logger.info(f"release created: {response_release}")
         logger.info(f"release_id: {release_id}")
-        filepath_manifest = Path("./data/06_reporting/yolo/best/manifest.yaml")
+        filepath_manifest = Path("./data/03_reporting/yolo/best/manifest.yaml")
         assert filepath_manifest.exists()
         logger.info("Uploading the manifest.yaml file")
         response_upload_manifest_yaml = upload_asset(
@@ -302,7 +302,7 @@ if __name__ == "__main__":
             release_name=release_name,
             filepath_manifest=filepath_manifest,
         )
-        dir_exports = Path("./data/04_models/yolo-export/best/")
+        dir_exports = Path("./data/02_models/yolo-export/best/")
         subdirs = [d for d in dir_exports.iterdir() if d.is_dir()]
 
         for subdir_format in subdirs:
@@ -361,7 +361,7 @@ if __name__ == "__main__":
             owner=owner,
             repo=repo,
             release_id=release_id,
-            filepath_asset=Path("./data/04_models/yolo/best/weights/best.pt"),
+            filepath_asset=Path("./data/02_models/yolo/best/weights/best.pt"),
             name=f"{model_name}.pt",
             github_access_token=GITHUB_ACCESS_TOKEN,
         )
