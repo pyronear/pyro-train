@@ -19,7 +19,7 @@ stages:
         uv run python ./scripts/data/model_input/build.py
         --input-dir ./data/01_model_input/yolo_train_val
         --output-dir ./data/01_model_input/yolo_train_val_small
-        --sampling-ratio 0.01
+        --sampling-ratio 1
         --random-seed 0
         --loglevel info
       - >-

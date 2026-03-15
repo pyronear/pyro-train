@@ -34,6 +34,7 @@ jobs:
     name: Run training
     needs: start-runner
     runs-on: ${{ needs.start-runner.outputs.label }}
+    timeout-minutes: 1440
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
