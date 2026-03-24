@@ -18,12 +18,13 @@ The Data pipeline is organized with a [dvc.yaml](./dvc.yaml) file.
 This section list and describes all the DVC stages that are defined in the
 [dvc.yaml](./dvc.yaml) file:
 
-- __fetch_model_input__: Download the `yolo_train_val` dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v2.0.0`.
-- __subsample_model_input__: Sample 5% of the fetched `yolo_train_val` dataset for fast iteration.
-- __train_yolo_baseline__: Train a YOLO baseline model on the 5% subsampled dataset.
+- __fetch_model_input__: Download the `yolo_train_val` dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v2.1.0`.
 - __train_yolo_best__: Train the best YOLO model on the full dataset.
 - __build_manifest_yolo_best__: Build the manifest.yaml file to attach with the model.
-- __export_yolo_best__: Export the best YOLO model to different formats (ONNX, NCNN).
+- __fetch_sequential_val__: Download the sequential val dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v2.1.0`.
+- __predict_sequential_val__: Run per-frame YOLO predictions on the sequential val set and save label files.
+- __optimize_sequential_val__: Grid-search engine parameters (nb_consecutive_frames × conf_thresh) on val predictions and save top-20 results.
+- __export_yolo_best__: Export the best YOLO model to ONNX and NCNN formats.
 
 ## Setup
 
@@ -264,44 +265,71 @@ batch:
 make run_yolo_benchmark
 ```
 
-## Error Analysis on Val Split
+## Error Analysis
 
-### 1. Fetch data
+### Frame-based (YOLO) — `yolo_train_val`
+
+#### 1. Fetch data
 
 ```sh
-bash fetch_data.sh
+uv run dvc repro fetch_model_input
 ```
 
-### 2. Run model on `yolo_train_val/val` and collect failures
+#### 2. Run model and collect failures
 
 ```sh
-uv run python eval_yolo_val.py --model-path mongoose.pt
+uv run python eval_yolo_val.py --model-path ./data/02_models/yolo/best/weights/best.pt
 ```
 
 Defaults: `--conf 0.2`, `--imgsz 1024`, device auto-detected.
-Failures are saved to `failures_val/`:
-- `failures_val/fp/` — background images where the model fired (false positives)
-- `failures_val/fn/` — wildfire images the model missed (false negatives)
+Failures are saved to `failures_val/fp/` (false positives) and `failures_val/fn/` (false negatives).
 
-Each failure image has a matching `.txt` prediction label file alongside it.
-
-### 3. Visualize failures in FiftyOne
+#### 3. Visualize in FiftyOne
 
 ```sh
 uv run python view_yolo_val_failures.py
+# FP → http://localhost:5151  |  FN → http://localhost:5152
 ```
 
-Opens two FiftyOne sessions:
-- FP failures → [http://localhost:5151](http://localhost:5151)
-- FN failures → [http://localhost:5152](http://localhost:5152)
+---
 
-Each sample shows `predictions` (model output) and `ground_truth` (GT labels).
-To view only one split:
+### Sequential (Engine) — `sequential_train_val`
+
+Runs predictions on train/val/test, optimizes engine parameters on val, then collects failures.
+
+#### 1. Fetch data
 
 ```sh
-uv run python view_yolo_val_failures.py --split fp
-uv run python view_yolo_val_failures.py --split fn
+uv run dvc repro fetch_sequential_val
+# or fetch all sets manually via dvc get / fetch_data.sh
 ```
+
+#### 2. Run full sequential analysis
+
+```sh
+bash run_seq_analysis.sh [model_path]
+# default model: ./data/02_models/yolo/best/weights/best.pt
+```
+
+This will:
+1. Run per-frame YOLO predictions on train/val/test (cached — skips if labels already exist)
+2. Grid-search `nb_consecutive_frames` (4–8) × `conf_thresh` (0.05–0.40) on val
+3. Apply best params to train/val/test and copy failures to `failures_train/`, `failures_val_seq/`, `failures_test/`
+
+#### 3. Visualize in FiftyOne
+
+```sh
+bash view_seq_failures.sh val    # or: train / test
+```
+
+Opens a FiftyOne session at [http://localhost:5151](http://localhost:5151).
+Each sequence is separated by a black frame. Shows:
+- `predictions` (red) — YOLO detections per frame
+- `ground_truth` (green) — GT labels (wildfire sequences only)
+
+Two datasets are loaded:
+- `failures_fn_wildfire` — missed wildfire sequences (false negatives)
+- `failures_fp_alerted` — sequences that triggered a false alert
 
 ## Known Issues
 
