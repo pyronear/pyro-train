@@ -190,16 +190,16 @@ stages:
   fetch_model_input:
     cmd:
     - uv run dvc get https://github.com/pyronear/pyro-dataset 
-      data/processed/yolo_train_val --rev v2.0.0 --out 
+      data/processed/yolo_train_val --rev v2.1.0 --out 
       ./data/01_model_input/yolo_train_val || uv run dvc get 
       git@github.com:pyronear/pyro-dataset.git data/processed/yolo_train_val 
-      --rev v2.0.0 --out ./data/01_model_input/yolo_train_val
+      --rev v2.1.0 --out ./data/01_model_input/yolo_train_val
     outs:
     - path: ./data/01_model_input/yolo_train_val
       hash: md5
-      md5: fdfd35a4ac94ba1468938f7e173cfc6c.dir
-      size: 1735515846
-      nfiles: 29627
+      md5: fcd56c8728d160e957bf0acd8049368d.dir
+      size: 1780235401
+      nfiles: 30387
   fetch_sequential_val:
     cmd:
     - uv run dvc get https://github.com/pyronear/pyro-dataset 
@@ -219,13 +219,14 @@ stages:
     - uv run python ./scripts/model/yolo/evaluate_sequential.py --model-path 
       ./data/02_models/yolo-export/best/onnx/cpu/best.onnx --data-dir 
       ./data/01_model_input/sequential_train_val/val --output-dir 
-      ./data/03_reporting/yolo/sequential/best/ --max-frames 15 --loglevel info
+      ./data/03_reporting/yolo/sequential/best/ --max-frames 15 --loglevel 
+      warning --force-cpu
     deps:
     - path: ./data/01_model_input/sequential_train_val/val
       hash: md5
-      md5: c49c71dc875caabc1442386bb10f69d9.dir
-      size: 621879969
-      nfiles: 12160
+      md5: 2ca47638a4b0cc9ca7d4011376c54e45.dir
+      size: 631259421
+      nfiles: 12448
     - path: ./data/02_models/yolo-export/best/onnx/cpu
       hash: md5
       md5: 7c34c4326c3922a9e35a7142aba6ce6f.dir
@@ -233,13 +234,13 @@ stages:
       nfiles: 1
     - path: ./scripts/model/yolo/evaluate_sequential.py
       hash: md5
-      md5: 7494a8ab99c9ae838066a6e11a574298
-      size: 8148
+      md5: 2e3cbddd3142874d2127fc875c9faca7
+      size: 8450
     outs:
     - path: ./data/03_reporting/yolo/sequential/best/
       hash: md5
-      md5: f03d86e5fe88bc994a7b1eb2a407da6b.dir
-      size: 38182
+      md5: 93d5fb63078e1f20386e9e5be7a2c839.dir
+      size: 39230
       nfiles: 1
   predict_sequential_val:
     cmd:
@@ -281,8 +282,8 @@ stages:
       nfiles: 3438
     - path: optimize_sequential.py
       hash: md5
-      md5: 6898c5b9a1359ea239a46f72456393b3
-      size: 8580
+      md5: 824da7d2cc55809d597c83cfc5cf1915
+      size: 8645
     outs:
     - path: ./data/03_reporting/sequential/grid_search_val.tsv
       hash: md5

@@ -44,6 +44,7 @@ from ultralytics import YOLO  # type: ignore[attr-defined]  # noqa: E402
 import fiftyone as fo  # noqa: E402
 
 logging.getLogger().setLevel(logging.WARNING)
+logging.getLogger("pyroengine").setLevel(logging.WARNING)
 _DUMMY_FRAME = Image.new("RGB", (1, 1))
 
 

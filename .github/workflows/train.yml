@@ -53,10 +53,7 @@ jobs:
         run: uv sync
 
       - name: Run pipeline
-        run: |
-          uv run dvc freeze train_yolo_best
-          uv run dvc pull train_yolo_best
-          uv run dvc repro
+        run: uv run dvc repro
 
       - name: Push artifacts to DVC remote
         run: uv run dvc push
@@ -77,7 +74,7 @@ jobs:
       - name: Download test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/yolo_test --rev v2.0.0 \
+            data/processed/yolo_test --rev v2.1.0 \
             --out ./data/test/yolo_test
 
       - name: Run evaluation
@@ -150,6 +147,7 @@ jobs:
           export OPT_RESULTS=./data/03_reporting/sequential/grid_search_val.tsv
 
           # Fetch baseline results from main (may not exist on first run)
+          git fetch origin main --depth=1 2>/dev/null || true
           export BASELINE_JSON=$(git show origin/main:results/eval_results.json 2>/dev/null || echo "{}")
           export BASELINE_SEQ_JSON=$(git show origin/main:results/eval_sequential_results.json 2>/dev/null || echo "{}")
 

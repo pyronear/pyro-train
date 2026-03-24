@@ -4,7 +4,7 @@ from predict_sequential.py.
 
 Grid:
   nb_consecutive_frames : 4 → 8  (step 1)
-  conf_thresh           : 0.05 → 0.30 (step 0.05)
+  conf_thresh           : 0.05 → 0.40 (step 0.05)
 
 Usage:
   uv run python optimize_sequential.py --labels-dir predictions_labels/
@@ -38,6 +38,7 @@ from pyroengine.engine import Engine  # noqa: E402
 
 ssl._create_default_https_context = ssl._create_unverified_context  # noqa: SLF001
 logging.getLogger().setLevel(logging.WARNING)
+logging.getLogger("pyroengine").setLevel(logging.WARNING)
 
 _DUMMY_FRAME = Image.new("RGB", (1, 1))
 
@@ -130,7 +131,7 @@ def run_grid(
     done = 0
     for nb_frames in nb_frames_values:
         for conf_thresh in conf_thresh_values:
-            engine = _make_engine(nb_frames, conf_thresh)
+            engine = _make_engine(nb_frames, float(conf_thresh))
             tp = fn = fp = tn = 0
             for (category, sequence), frames in grouped.items():
                 alerted = _evaluate_sequence(engine, frames, sequence)
@@ -195,7 +196,7 @@ if __name__ == "__main__":
     fp_count = sum(1 for (cat, _) in grouped if cat == "fp")
     print(f"Loaded {len(grouped)} sequences with ≥{args.min_frames} frames ({wf} wildfire, {fp_count} fp)\n")
 
-    nb_frames_values = list(range(4, 7))
+    nb_frames_values = list(range(4, 9))
     conf_thresh_values = [round(v, 2) for v in np.arange(0.05, 0.41, 0.05)]
 
     results = run_grid(grouped, nb_frames_values, conf_thresh_values)

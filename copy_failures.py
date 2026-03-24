@@ -33,6 +33,7 @@ from PIL import Image, ImageDraw, ImageFont  # noqa: E402
 from pyroengine.engine import Engine  # noqa: E402
 
 logging.getLogger().setLevel(logging.WARNING)
+logging.getLogger("pyroengine").setLevel(logging.WARNING)
 
 _DUMMY_FRAME = Image.new("RGB", (1, 1))
 
