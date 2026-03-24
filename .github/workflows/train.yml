@@ -55,6 +55,7 @@ jobs:
       - name: Run pipeline
         run: |
           uv run dvc freeze train_yolo_best
+          uv run dvc pull train_yolo_best
           uv run dvc repro
 
       - name: Push artifacts to DVC remote
