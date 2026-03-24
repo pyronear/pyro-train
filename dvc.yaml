@@ -4,11 +4,11 @@ stages:
     cmd:
       - >-
         uv run dvc get https://github.com/pyronear/pyro-dataset
-        data/processed/yolo_train_val --rev v2.0.0
+        data/processed/yolo_train_val --rev v2.1.0
         --out ./data/01_model_input/yolo_train_val
         ||
         uv run dvc get git@github.com:pyronear/pyro-dataset.git
-        data/processed/yolo_train_val --rev v2.0.0
+        data/processed/yolo_train_val --rev v2.1.0
         --out ./data/01_model_input/yolo_train_val
     outs:
       - ./data/01_model_input/yolo_train_val
@@ -54,14 +54,44 @@ stages:
     cmd:
       - >-
         uv run dvc get https://github.com/pyronear/pyro-dataset
-        data/processed/sequential_train_val/val --rev v2.0.0
+        data/processed/sequential_train_val/val --rev v2.1.0
         --out ./data/01_model_input/sequential_train_val/val
         ||
         uv run dvc get git@github.com:pyronear/pyro-dataset.git
-        data/processed/sequential_train_val/val --rev v2.0.0
+        data/processed/sequential_train_val/val --rev v2.1.0
         --out ./data/01_model_input/sequential_train_val/val
     outs:
       - ./data/01_model_input/sequential_train_val/val
+
+  predict_sequential_val:
+    cmd:
+      - >-
+        uv run python predict_sequential.py
+        --model-path ./data/02_models/yolo/best/weights/best.pt
+        --data-dir ./data/01_model_input/sequential_train_val/val
+        --labels-dir ./data/03_reporting/sequential/predictions_labels_val
+    deps:
+      - predict_sequential.py
+      - ./data/02_models/yolo/best/weights/best.pt
+      - ./data/01_model_input/sequential_train_val/val
+    outs:
+      - ./data/03_reporting/sequential/predictions_labels_val
+
+  optimize_sequential_val:
+    cmd:
+      - >-
+        uv run python optimize_sequential.py
+        --labels-dir ./data/03_reporting/sequential/predictions_labels_val
+        --min-frames 0
+        --output ./data/03_reporting/sequential/grid_search_val.tsv
+        --output-top ./data/03_reporting/sequential/grid_search_val_top20.tsv
+        --top-n 20
+    deps:
+      - optimize_sequential.py
+      - ./data/03_reporting/sequential/predictions_labels_val
+    outs:
+      - ./data/03_reporting/sequential/grid_search_val.tsv
+      - ./data/03_reporting/sequential/grid_search_val_top20.tsv
 
   export_yolo_best:
     matrix:

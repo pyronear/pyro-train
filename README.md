@@ -264,6 +264,66 @@ batch:
 make run_yolo_benchmark
 ```
 
+## Error Analysis on Val Split
+
+### 1. Fetch data
+
+```sh
+bash fetch_data.sh
+```
+
+### 2. Run model on `yolo_train_val/val` and collect failures
+
+```sh
+uv run python eval_yolo_val.py --model-path mongoose.pt
+```
+
+Defaults: `--conf 0.2`, `--imgsz 1024`, device auto-detected.
+Failures are saved to `failures_val/`:
+- `failures_val/fp/` — background images where the model fired (false positives)
+- `failures_val/fn/` — wildfire images the model missed (false negatives)
+
+Each failure image has a matching `.txt` prediction label file alongside it.
+
+### 3. Visualize failures in FiftyOne
+
+```sh
+uv run python view_yolo_val_failures.py
+```
+
+Opens two FiftyOne sessions:
+- FP failures → [http://localhost:5151](http://localhost:5151)
+- FN failures → [http://localhost:5152](http://localhost:5152)
+
+Each sample shows `predictions` (model output) and `ground_truth` (GT labels).
+To view only one split:
+
+```sh
+uv run python view_yolo_val_failures.py --split fp
+uv run python view_yolo_val_failures.py --split fn
+```
+
+## Known Issues
+
+### MPS bounding box corruption on macOS 14+ (ultralytics 8.4.21)
+
+Ultralytics 8.4.21 contains a bug where MPS inference produces corrupted bounding box
+X-coordinates (`cx` and `w`) while Y-coordinates remain correct. Root cause: in-place
+`clamp_()` operations in `clip_boxes()` are broken by Apple's Metal backend on macOS 14+.
+See [ultralytics#23140](https://github.com/ultralytics/ultralytics/issues/23140).
+
+The fix was merged upstream but the version check `MACOS_VERSION.startswith("14.")` does
+not match macOS versions beyond 14.x (e.g. macOS 26 / Tahoe). Apply this one-line patch
+to `.venv/lib/python3.12/site-packages/ultralytics/utils/__init__.py`:
+
+```python
+# Before
+NOT_MACOS14 = not (MACOS and MACOS_VERSION.startswith("14."))
+
+# After
+NOT_MACOS14 = not (MACOS and int((MACOS_VERSION or "0").split(".")[0]) >= 14)
+```
+
 ## 🌎 Release a new Model to the world
 
 The script to release a new version of the model is located in
