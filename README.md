@@ -297,6 +297,102 @@ uv run python view_yolo_val_failures.py
 
 Runs predictions on train/val/test, optimizes engine parameters on val, then collects failures.
 
+#### Option A — Using CI outputs (no re-training needed)
+
+CI already runs `predict_sequential_val` and `optimize_sequential_val`. Pull those results and use the best params directly.
+
+**1. Pull CI outputs from DVC:**
+
+```sh
+dvc pull data/03_reporting/sequential/
+dvc pull data/01_model_input/sequential_train_val/val
+```
+
+**2. Read the best engine params from the CI grid search:**
+
+```sh
+tail -n +2 data/03_reporting/sequential/grid_search_val.tsv | head -1
+# columns: nb_consecutive_frames  conf_thresh  precision  recall  f1  ...
+```
+
+**3. Collect val failures** (replace `NB_FRAMES` and `CONF` with values from step 2):
+
+```sh
+uv run python copy_failures.py \
+  --labels-dir ./data/03_reporting/sequential/predictions_labels_val \
+  --data-dir ./data/01_model_input/sequential_train_val/val \
+  --output-dir failures_val_seq \
+  --nb-consecutive-frames NB_FRAMES \
+  --conf-thresh CONF
+```
+
+**4. Visualize in FiftyOne:**
+
+```sh
+uv run python view_failures.py \
+  --failures-dir failures_val_seq \
+  --labels-dir ./data/03_reporting/sequential/predictions_labels_val \
+  --data-dir ./data/01_model_input/sequential_train_val/val
+# FN (missed wildfire) → http://localhost:5151
+# FP (false alerts)    → http://localhost:5152
+```
+
+#### Option A (test set) — Using CI params, local predictions
+
+The test set is not part of the CI pipeline, so predictions must be run locally. The best engine params from CI can still be reused.
+
+**1. Fetch test data:**
+
+```sh
+SSL_CERT_FILE=$(uv run python -c "import certifi; print(certifi.where())") \
+uv run dvc get https://github.com/pyronear/pyro-dataset \
+  data/processed/sequential_test --rev v2.1.0 \
+  --out ./data/test/sequential_test
+```
+
+**2. Pull CI grid search results:**
+
+```sh
+dvc pull data/03_reporting/sequential/grid_search_val.tsv
+```
+
+**3. Read best params:**
+
+```sh
+tail -n +2 data/03_reporting/sequential/grid_search_val.tsv | head -1
+# columns: nb_consecutive_frames  conf_thresh  precision  recall  f1  ...
+```
+
+**4. Run predictions on test set:**
+
+```sh
+uv run python predict_sequential.py \
+  --model-path ./data/02_models/yolo/best/weights/best.pt \
+  --data-dir ./data/test/sequential_test/test \
+  --labels-dir predictions_labels_test
+```
+
+**5. Collect test failures** (replace `NB_FRAMES` and `CONF` with values from step 3):
+
+```sh
+uv run python copy_failures.py \
+  --labels-dir predictions_labels_test \
+  --data-dir ./data/test/sequential_test/test \
+  --output-dir failures_test \
+  --nb-consecutive-frames NB_FRAMES \
+  --conf-thresh CONF
+```
+
+**6. Visualize in FiftyOne:**
+
+```sh
+bash view_seq_failures.sh test
+# FN (missed wildfire) → http://localhost:5151
+# FP (false alerts)    → http://localhost:5152
+```
+
+#### Option B — Full local run (re-predict + optimize)
+
 #### 1. Fetch data
 
 ```sh
