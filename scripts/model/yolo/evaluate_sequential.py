@@ -142,6 +142,11 @@ def make_cli_parser() -> argparse.ArgumentParser:
         default="warning",
         help="logging level (debug, info, warning, error)",
     )
+    parser.add_argument(
+        "--force-cpu",
+        action="store_true",
+        help="disable CoreML/CUDA and force CPUExecutionProvider for ONNX inference",
+    )
     return parser
 
 
@@ -168,6 +173,10 @@ if __name__ == "__main__":
 
     if not validate_parsed_args(args):
         exit(1)
+
+    if args["force_cpu"]:
+        import onnxruntime
+        onnxruntime.get_available_providers = lambda: ["CPUExecutionProvider"]
 
     args["output_dir"].mkdir(parents=True, exist_ok=True)
 

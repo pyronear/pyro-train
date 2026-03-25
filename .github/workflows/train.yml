@@ -74,7 +74,7 @@ jobs:
       - name: Download test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/yolo_test --rev v2.0.0 \
+            data/processed/yolo_test --rev v2.1.0 \
             --out ./data/test/yolo_test
 
       - name: Run evaluation
@@ -90,17 +90,29 @@ jobs:
       - name: Download sequential test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/sequential_test/test --rev v2.0.0 \
+            data/processed/sequential_test --rev v2.1.0 \
             --out ./data/test/sequential_test
 
-      - name: Run sequential evaluation
+      - name: Run sequential predictions on test
         run: |
-          uv run python ./scripts/model/yolo/evaluate_sequential.py \
-            --model-path ./data/02_models/yolo-export/best/onnx/cpu/best.onnx \
-            --data-dir ./data/test/sequential_test \
-            --output-dir ./data/03_reporting/yolo/sequential/eval/ \
-            --max-frames 15 \
-            --loglevel info
+          uv run python predict_sequential.py \
+            --model-path ./data/02_models/yolo/best/weights/best.pt \
+            --data-dir ./data/test/sequential_test/test \
+            --labels-dir ./data/03_reporting/sequential/predictions_labels_test
+
+      - name: Run sequential evaluation on test with optimized params
+        run: |
+          NB_FRAMES=$(tail -n +2 ./data/03_reporting/sequential/grid_search_val.tsv | head -1 | cut -f1)
+          CONF_THRESH=$(tail -n +2 ./data/03_reporting/sequential/grid_search_val.tsv | head -1 | cut -f2)
+          echo "Using nb_consecutive_frames=$NB_FRAMES conf_thresh=$CONF_THRESH"
+          uv run python copy_failures.py \
+            --labels-dir ./data/03_reporting/sequential/predictions_labels_test \
+            --data-dir ./data/test/sequential_test/test \
+            --output-dir ./data/03_reporting/sequential/failures_test \
+            --nb-consecutive-frames "$NB_FRAMES" \
+            --conf-thresh "$CONF_THRESH" \
+            --min-frames 0 \
+            --output-json ./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json
 
       - name: Commit eval results to result branch
         run: |
@@ -132,13 +144,15 @@ jobs:
           export RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
           export RESULTS=./data/03_reporting/yolo/eval/eval_results.json
           export SEQ_RESULTS=./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json
+          export OPT_RESULTS=./data/03_reporting/sequential/grid_search_val.tsv
 
           # Fetch baseline results from main (may not exist on first run)
+          git fetch origin main --depth=1 2>/dev/null || true
           export BASELINE_JSON=$(git show origin/main:results/eval_results.json 2>/dev/null || echo "{}")
           export BASELINE_SEQ_JSON=$(git show origin/main:results/eval_sequential_results.json 2>/dev/null || echo "{}")
 
           BODY=$(uv run python - <<'PYEOF'
-          import json, os
+          import json, os, csv
 
           with open(os.environ["RESULTS"]) as f:
               curr = json.load(f)
@@ -151,8 +165,20 @@ jobs:
           baseline_seq_json = os.environ.get("BASELINE_SEQ_JSON", "{}")
           prev_seq = json.loads(baseline_seq_json) if baseline_seq_json.strip() != "{}" else None
 
+          # Load top 10 optimization results
+          opt_rows = []
+          opt_path = os.environ.get("OPT_RESULTS", "")
+          if opt_path and os.path.exists(opt_path):
+              with open(opt_path) as f:
+                  reader = csv.DictReader(f, delimiter="\t")
+                  for i, row in enumerate(reader):
+                      if i >= 10:
+                          break
+                      opt_rows.append(row)
+
           def fmt(v):
-              return f"{v:.4f}" if v is not None else "N/A"
+              import math
+              return f"{v:.4f}" if v is not None and not (isinstance(v, float) and math.isnan(v)) else "N/A"
 
           def delta(curr_val, prev_val):
               if prev_val is None or curr_val is None:
@@ -183,6 +209,16 @@ jobs:
           )
           tp, fn, fp, tn = seq["tp"], seq["fn"], seq["fp"], seq["tn"]
 
+          opt_table = ""
+          if opt_rows:
+              opt_table = "## Engine parameter optimization (top 10 on val)\n\n"
+              opt_table += "| nb_frames | conf | TP | FN | FP | TN | Recall | FPR | F1 |\n"
+              opt_table += "|-----------|------|----|----|----|----|--------|-----|----|\n"
+              opt_table += "\n".join(
+                  f"| {r['nb_consecutive_frames']} | {r['conf_thresh']} | {r['tp']} | {r['fn']} | {r['fp']} | {r['tn']} | {r['recall']} | {r['fpr']} | {r['f1']} |"
+                  for r in opt_rows
+              )
+
           baseline_note = "_(no baseline on main yet)_" if prev is None else "_(vs last committed results on main)_"
 
           print(f"""## Evaluation results on test set
@@ -191,7 +227,7 @@ jobs:
           |--------|------|---------|---|
           {rows}
 
-          ## Sequential evaluation (engine, max {seq['max_frames']} frames/seq)
+          ## Sequential evaluation on test (optimized params: nb_frames={seq.get('nb_consecutive_frames', 'n/a')}, conf={seq.get('conf_thresh', 'n/a')})
 
           TP={tp} FN={fn} FP={fp} TN={tn}
 
@@ -199,8 +235,10 @@ jobs:
           |--------|------|---------|---|
           {seq_rows}
 
+          {opt_table}
+
           {baseline_note}
-          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v2.0.0""")
+          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v2.1.0""")
           PYEOF
           )
 
