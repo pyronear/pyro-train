@@ -81,7 +81,7 @@ stages:
     - >-
       uv run python optimize_sequential.py
       --labels-dir ./data/03_reporting/sequential/predictions_labels_val
-      --min-frames 0
+      --min-frames 8
       --output ./data/03_reporting/sequential/grid_search_val.tsv
       --output-top ./data/03_reporting/sequential/grid_search_val_top20.tsv
       --top-n 20

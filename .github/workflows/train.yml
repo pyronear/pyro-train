@@ -111,7 +111,7 @@ jobs:
             --output-dir ./data/03_reporting/sequential/failures_test \
             --nb-consecutive-frames "$NB_FRAMES" \
             --conf-thresh "$CONF_THRESH" \
-            --min-frames 0 \
+            --min-frames 8 \
             --output-json ./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json
 
       - name: Commit eval results to result branch
