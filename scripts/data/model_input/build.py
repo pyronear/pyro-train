@@ -42,6 +42,12 @@ def make_cli_parser() -> argparse.ArgumentParser:
         type=int,
     )
     parser.add_argument(
+        "--remove-background",
+        help="Remove background (negative) images that have empty label files",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
         "-log",
         "--loglevel",
         default="warning",
@@ -116,6 +122,7 @@ def sample_dataset(
     output_dir: Path,
     sampling_ratio: float = 0.1,
     random_seed: int = 0,
+    remove_background: bool = False,
 ) -> list[dict]:
     """
     Return a downsampled list of images and labels for the given
@@ -140,6 +147,15 @@ def sample_dataset(
             downsampled_image_filepaths = random.Random(random_seed).sample(
                 images_filepaths,
                 k=k,
+            )
+        if remove_background:
+            downsampled_image_filepaths = [
+                fp for fp in downsampled_image_filepaths
+                if (labels_split_dir / f"{fp.stem}.txt").exists()
+                and (labels_split_dir / f"{fp.stem}.txt").stat().st_size > 0
+            ]
+            logging.info(
+                f"[{split}] Removed background images. Remaining: {len(downsampled_image_filepaths)}"
             )
         downsampled_label_filepaths = [
             labels_split_dir / f"{fp.stem}.txt"
@@ -190,6 +206,7 @@ if __name__ == "__main__":
         output_dir = args["output_dir"]
         sampling_ratio = args["sampling_ratio"]
         random_seed = args["random_seed"]
+        remove_background = args["remove_background"]
 
         logging.info(f"Creating dirs at {output_dir}")
         shutil.rmtree(output_dir, ignore_errors=True)
@@ -202,6 +219,7 @@ if __name__ == "__main__":
                 output_dir=output_dir / "datasets",
                 sampling_ratio=sampling_ratio,
                 random_seed=random_seed,
+                remove_background=remove_background,
             )
         )
         write_data_yaml(output_dir / "datasets" / "data.yaml")
