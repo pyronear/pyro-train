@@ -17,6 +17,7 @@ dependencies = [
     "pyroengine @ git+https://github.com/pyronear/pyro-engine.git",
     "pyroclient @ git+https://github.com/pyronear/pyro-api.git#subdirectory=client",
     "fiftyone>=1.13.4",
+    "huggingface-hub>=1.8.0",
 ]
 
 [dependency-groups]

@@ -450,23 +450,40 @@ NOT_MACOS14 = not (MACOS and int((MACOS_VERSION or "0").split(".")[0]) >= 14)
 
 ## 🌎 Release a new Model to the world
 
-The script to release a new version of the model is located in
-`./scripts/model/yolo/release.py`.
-Make sure to set your `GITHUB_ACCESS_TOKEN` as an env variable in your shell
-before running the following script:
+The script to upload a model to Hugging Face is located in `./scripts/hf_upload.py`.
+
+### 1. Login to Hugging Face
 
 ```sh
-export GITHUB_ACCESS_TOKEN=XXX
-uv run python ./scripts/release.py \
-  --version v4.0.0 \
-  --release-name "dazzling dragonfly" \
-  --github-owner earthtoolsmaker \
-  --github-repo pyro-train
+uv run huggingface-cli login
 ```
 
-This will create a new release in the github repository with the model
-artifacts such as its weights.
+### 2. Upload the model
 
-__Note__: The current naming convention for release is to use an adjective
-paired with an animal name starting with the same letter (eg. artistic alpaca,
-wise wolf, ...).
+```sh
+uv run python scripts/hf_upload.py \
+  --version v6.0.0 \
+  --release-name "nimble narwhal" \
+  --hf-org pyronear
+```
+
+This will create `pyronear/{model_type}_{release-name}_{version}` on Hugging Face and upload:
+- `best.pt` — PyTorch weights
+- `best.onnx` — ONNX export (cpu)
+- `ncnn_cpu.zip` — NCNN export (cpu)
+- `manifest.yaml` — training manifest
+- `README.md` — auto-generated model card
+
+### 3. (Optional) Export locally without uploading
+
+```sh
+uv run python scripts/hf_upload.py \
+  --version v6.0.0 \
+  --release-name "nimble narwhal" \
+  --hf-org pyronear \
+  --output-dir ./hf_export/
+```
+
+__Note__: The naming convention is an adjective paired with an animal name
+starting with the same letter, in alphabetical order across releases
+(eg. `nimble narwhal`, `outstanding octopus`, `powerful panther`, ...).
