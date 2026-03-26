@@ -4,7 +4,7 @@ Upload a trained Pyronear YOLO model to Hugging Face Hub.
 Creates a model repo named `{hf-org}/{model_type}_{release_name}_{version}`
 and uploads:
   - best.pt          (PyTorch weights)
-  - best.onnx        (ONNX export, cpu)
+  - onnx_cpu.tar.gz  (ONNX export, cpu)
   - ncnn/            (NCNN export, cpu)
   - manifest.yaml    (training manifest)
   - README.md        (auto-generated model card)
@@ -90,7 +90,7 @@ Pyronear YOLO model for early wildfire smoke detection.
 | File | Description |
 |---|---|
 | `best.pt` | PyTorch weights |
-| `best.onnx` | ONNX export (cpu) |
+| `onnx_cpu.tar.gz` | ONNX export (cpu) |
 | `ncnn_cpu.tar.gz` | NCNN export (cpu) |
 | `manifest.yaml` | Full training manifest |
 
@@ -115,7 +115,7 @@ import onnxruntime as ort
 import numpy as np
 from PIL import Image
 
-path = hf_hub_download(repo_id="{repo_id}", filename="best.onnx")
+path = hf_hub_download(repo_id="{repo_id}", filename="onnx_cpu.tar.gz")
 session = ort.InferenceSession(path, providers=["CPUExecutionProvider"])
 
 img = Image.open("image.jpg").resize(({imgsz}, {imgsz}))
@@ -181,10 +181,10 @@ if __name__ == "__main__":
         # best.pt
         shutil.copy(args.model_pt, tmp_dir / "best.pt")
 
-        # ONNX cpu
-        onnx_src = args.exports_dir / "onnx" / "cpu" / "best.onnx"
+        # ONNX cpu — archived
+        onnx_src = args.exports_dir / "onnx" / "cpu"
         if onnx_src.exists():
-            shutil.copy(onnx_src, tmp_dir / "best.onnx")
+            shutil.make_archive(str(tmp_dir / "onnx_cpu"), "gztar", root_dir=onnx_src, base_dir=".")
         else:
             logger.warning(f"ONNX export not found: {onnx_src}")
 
