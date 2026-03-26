@@ -271,7 +271,7 @@ stages:
   optimize_sequential_val:
     cmd:
     - uv run python optimize_sequential.py --labels-dir 
-      ./data/03_reporting/sequential/predictions_labels_val --min-frames 0 
+      ./data/03_reporting/sequential/predictions_labels_val --min-frames 8 
       --output ./data/03_reporting/sequential/grid_search_val.tsv --output-top 
       ./data/03_reporting/sequential/grid_search_val_top20.tsv --top-n 20
     deps:
@@ -287,9 +287,9 @@ stages:
     outs:
     - path: ./data/03_reporting/sequential/grid_search_val.tsv
       hash: md5
-      md5: 18e548f7a9e9523ee76ac104f57398d9
-      size: 1978
+      md5: 8bae210202dc4210162712779346d572
+      size: 1896
     - path: ./data/03_reporting/sequential/grid_search_val_top20.tsv
       hash: md5
-      md5: b909248f593c71486faa8553e62e09c0
-      size: 1025
+      md5: 42f461234b5a48ca27bb28a46afb2cd0
+      size: 975
