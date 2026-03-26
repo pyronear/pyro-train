@@ -91,7 +91,7 @@ Pyronear YOLO model for early wildfire smoke detection.
 |---|---|
 | `best.pt` | PyTorch weights |
 | `best.onnx` | ONNX export (cpu) |
-| `ncnn_cpu.zip` | NCNN export (cpu), unzip before use |
+| `ncnn_cpu.tar.gz` | NCNN export (cpu) |
 | `manifest.yaml` | Full training manifest |
 
 ## Usage
@@ -127,7 +127,7 @@ outputs = session.run(None, {{session.get_inputs()[0].name: x}})
 
 ```bash
 # Unzip first
-unzip ncnn_cpu.zip -d ncnn_cpu/
+tar -xzf ncnn_cpu.tar.gz
 ```
 
 ### Download with huggingface_hub
@@ -191,7 +191,7 @@ if __name__ == "__main__":
         # NCNN cpu — zipped
         ncnn_src = args.exports_dir / "ncnn" / "cpu"
         if ncnn_src.exists():
-            shutil.make_archive(str(tmp_dir / "ncnn_cpu"), "zip", root_dir=ncnn_src, base_dir=".")
+            shutil.make_archive(str(tmp_dir / "ncnn_cpu"), "gztar", root_dir=ncnn_src, base_dir=".")
         else:
             logger.warning(f"NCNN export not found: {ncnn_src}")
 
