@@ -26,7 +26,7 @@ jobs:
         with:
           mode: start
           github-token: ${{ secrets.GH_PAT }}
-          ec2-image-id: ami-06c62c213d8fdc88f
+          ec2-image-id: ami-00bdc52b2f31415d0
           ec2-instance-type: g4dn.xlarge
           subnet-id: subnet-0ed91f5fc60959086
           security-group-id: sg-05cd9ff586699e8db
@@ -55,7 +55,9 @@ jobs:
       - name: Check CUDA environment
         run: |
           nvidia-smi
-          uv run python -c "import torch; print('torch:', torch.__version__); print('cuda:', torch.version.cuda); print('available:', torch.cuda.is_available()); print('device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'none')"
+          nvcc --version || true
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+          uv run python -c "import torch; print('torch:', torch.__version__); print('cuda:', torch.version.cuda); print('available:', torch.cuda.is_available()); print('device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'none'); import torch.backends.cudnn as cudnn; print('cudnn enabled:', cudnn.enabled); print('cudnn version:', cudnn.version())"
 
       - name: Run pipeline
         run: uv run dvc repro
