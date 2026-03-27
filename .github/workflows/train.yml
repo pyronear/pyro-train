@@ -22,15 +22,14 @@ jobs:
 
       - name: Start EC2 runner
         id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2.3.2
+        uses: machulav/ec2-github-runner@v2
         with:
           mode: start
           github-token: ${{ secrets.GH_PAT }}
-          ec2-image-id: ami-00bdc52b2f31415d0
-          ec2-instance-type: g4dn.xlarge
+          ec2-image-id: ami-078da566f22c68a26
+          ec2-instance-type: g5.xlarge
           subnet-id: subnet-0ed91f5fc60959086
           security-group-id: sg-05cd9ff586699e8db
-          root-volume-size: 100
   train:
     name: Run training
     needs: start-runner
@@ -276,7 +275,7 @@ jobs:
           aws-region: eu-west-3
 
       - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2.3.2
+        uses: machulav/ec2-github-runner@v2
         with:
           mode: stop
           github-token: ${{ secrets.GH_PAT }}
