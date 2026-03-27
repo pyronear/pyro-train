@@ -15,6 +15,7 @@ class YOLOModelVersion(Enum):
     version_10 = 10
     version_11 = 11
     version_12 = 12
+    version_26 = 26
 
 
 class YOLOModelSize(Enum):
