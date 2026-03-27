@@ -27,6 +27,7 @@ stages:
       --config ./scripts/model/yolo/configs/best.yaml
       --output-dir ./data/02_models/yolo/
       --experiment-name best
+      --device 0
       --loglevel info
     deps:
     - ./data/01_model_input/yolo_train_val
