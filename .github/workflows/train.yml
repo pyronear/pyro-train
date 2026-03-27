@@ -22,7 +22,7 @@ jobs:
 
       - name: Start EC2 runner
         id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2
+        uses: machulav/ec2-github-runner@v2.3.2
         with:
           mode: start
           github-token: ${{ secrets.GH_PAT }}
@@ -30,6 +30,7 @@ jobs:
           ec2-instance-type: g4dn.xlarge
           subnet-id: subnet-0ed91f5fc60959086
           security-group-id: sg-05cd9ff586699e8db
+          root-volume-size: 100
   train:
     name: Run training
     needs: start-runner
@@ -81,7 +82,7 @@ jobs:
       - name: Download test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/yolo_test --rev v2.1.0 \
+            data/processed/yolo_test --rev v2.2.0 \
             --out ./data/test/yolo_test
 
       - name: Run evaluation
@@ -97,7 +98,7 @@ jobs:
       - name: Download sequential test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/sequential_test --rev v2.1.0 \
+            data/processed/sequential_test --rev v2.2.0 \
             --out ./data/test/sequential_test
 
       - name: Run sequential predictions on test
@@ -245,7 +246,7 @@ jobs:
           {opt_table}
 
           {baseline_note}
-          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v2.1.0""")
+          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v2.2.0""")
           PYEOF
           )
 
@@ -275,7 +276,7 @@ jobs:
           aws-region: eu-west-3
 
       - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2
+        uses: machulav/ec2-github-runner@v2.3.2
         with:
           mode: stop
           github-token: ${{ secrets.GH_PAT }}
