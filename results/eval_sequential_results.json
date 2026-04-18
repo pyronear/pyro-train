@@ -1,12 +1,12 @@
 {
-  "nb_consecutive_frames": 6,
+  "nb_consecutive_frames": 5,
   "conf_thresh": 0.35,
-  "tp": 114,
-  "fn": 5,
-  "fp": 11,
-  "tn": 114,
-  "recall": 0.958,
-  "fpr": 0.088,
-  "precision": 0.912,
-  "f1": 0.9344
+  "tp": 113,
+  "fn": 6,
+  "fp": 9,
+  "tn": 116,
+  "recall": 0.9496,
+  "fpr": 0.072,
+  "precision": 0.9262,
+  "f1": 0.9378
 }
