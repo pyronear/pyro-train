@@ -6,6 +6,8 @@ from pathlib import Path
 
 from ultralytics import YOLO
 
+from pyro_train.model.yolo.augment import install_camera_robustness_augmentations
+
 
 def load_pretrained_model(model_str: str) -> YOLO:
     """
@@ -26,6 +28,7 @@ def train(
     Main function for running a train run.
     """
     assert data_yaml_path.exists(), f"data_yaml_path does not exist, {data_yaml_path}"
+    install_camera_robustness_augmentations()
     default_params = {
         # train parameters
         "batch": 16,
