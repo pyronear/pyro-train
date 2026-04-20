@@ -26,7 +26,7 @@ jobs:
         with:
           mode: start
           github-token: ${{ secrets.GH_PAT }}
-          ec2-image-id: ami-06c62c213d8fdc88f
+          ec2-image-id: ami-078da566f22c68a26
           ec2-instance-type: g4dn.xlarge
           subnet-id: subnet-0ed91f5fc60959086
           security-group-id: sg-05cd9ff586699e8db
@@ -74,7 +74,7 @@ jobs:
       - name: Download test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/yolo_test --rev v2.1.0 \
+            data/processed/yolo_test --rev v3.0.0 \
             --out ./data/test/yolo_test
 
       - name: Run evaluation
@@ -90,7 +90,7 @@ jobs:
       - name: Download sequential test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/sequential_test --rev v2.1.0 \
+            data/processed/sequential_test --rev v3.0.0 \
             --out ./data/test/sequential_test
 
       - name: Run sequential predictions on test
@@ -238,7 +238,7 @@ jobs:
           {opt_table}
 
           {baseline_note}
-          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v2.1.0""")
+          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v3.0.0""")
           PYEOF
           )
 

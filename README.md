@@ -18,10 +18,10 @@ The Data pipeline is organized with a [dvc.yaml](./dvc.yaml) file.
 This section list and describes all the DVC stages that are defined in the
 [dvc.yaml](./dvc.yaml) file:
 
-- __fetch_model_input__: Download the `yolo_train_val` dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v2.1.0`.
+- __fetch_model_input__: Download the `yolo_train_val` dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v3.0.0`.
 - __train_yolo_best__: Train the best YOLO model on the full dataset.
 - __build_manifest_yolo_best__: Build the manifest.yaml file to attach with the model.
-- __fetch_sequential_val__: Download the sequential val dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v2.1.0`.
+- __fetch_sequential_val__: Download the sequential val dataset from [pyro-dataset](https://github.com/pyronear/pyro-dataset) at `v3.0.0`.
 - __predict_sequential_val__: Run per-frame YOLO predictions on the sequential val set and save label files.
 - __optimize_sequential_val__: Grid-search engine parameters (nb_consecutive_frames × conf_thresh) on val predictions and save top-20 results.
 - __export_yolo_best__: Export the best YOLO model to ONNX and NCNN formats.
@@ -346,7 +346,7 @@ The test set is not part of the CI pipeline, so predictions must be run locally.
 ```sh
 SSL_CERT_FILE=$(uv run python -c "import certifi; print(certifi.where())") \
 uv run dvc get https://github.com/pyronear/pyro-dataset \
-  data/processed/sequential_test --rev v2.1.0 \
+  data/processed/sequential_test --rev v3.0.0 \
   --out ./data/test/sequential_test
 ```
 
