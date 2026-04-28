@@ -1,8 +1,8 @@
 {
-  "precision": 0.7454248276113616,
-  "recall": 0.7511196417146513,
-  "map50": 0.7414376401074969,
-  "map50_95": 0.45008761444944223,
+  "precision": 0.7447869286102259,
+  "recall": 0.6980166346769033,
+  "map50": 0.7126430247025456,
+  "map50_95": 0.42809704935814963,
   "model_dir": "data/02_models/yolo/best",
   "data": "data/test/yolo_test/data.yaml",
   "split": "test"
