@@ -53,7 +53,7 @@ stages:
     - uv run python ./scripts/data/model_input/build.py --input-dir 
       ./data/01_model_input/yolo_train_val --output-dir 
       ./data/01_model_input/yolo_train_val_small --sampling-ratio 1 
-      --random-seed 0 --loglevel info
+      --random-seed 0 --exclude-background --loglevel info
     - uv run python ./scripts/model/yolo/train.py --data 
       ./data/01_model_input/yolo_train_val_small/datasets/data.yaml --config 
       ./scripts/model/yolo/configs/best.yaml --output-dir ./data/02_models/yolo/
@@ -66,8 +66,8 @@ stages:
       nfiles: 32201
     - path: ./scripts/data/model_input/build.py
       hash: md5
-      md5: 7607af10f59267cf9859cb1d372aff26
-      size: 6432
+      md5: f745456171e8a8b24faca0e5f2bc0a22
+      size: 7800
     - path: ./scripts/model/yolo/configs/best.yaml
       hash: md5
       md5: 82ab9c26b11cfc5f72e1398bfceeb838
@@ -79,8 +79,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo/best
       hash: md5
-      md5: 0e3617cd00b6a1985129110757bca1a0.dir
-      size: 44813862
+      md5: 52216f9194f58306d24d4802af43394a.dir
+      size: 44857368
       nfiles: 24
   build_manifest_yolo_best:
     cmd:
@@ -90,8 +90,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: 0e3617cd00b6a1985129110757bca1a0.dir
-      size: 44813862
+      md5: 52216f9194f58306d24d4802af43394a.dir
+      size: 44857368
       nfiles: 24
     - path: ./scripts/model/yolo/build_manifest.py
       hash: md5
@@ -100,8 +100,8 @@ stages:
     outs:
     - path: ./data/03_reporting/yolo/best/
       hash: md5
-      md5: c01eb3ce79f23e0999d3220813c01881.dir
-      size: 13529
+      md5: d84534ecf412205433bb15237ab4215c.dir
+      size: 13570
       nfiles: 1
   export_yolo_best@onnx-cpu:
     cmd:
@@ -111,8 +111,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: 0e3617cd00b6a1985129110757bca1a0.dir
-      size: 44813862
+      md5: 52216f9194f58306d24d4802af43394a.dir
+      size: 44857368
       nfiles: 24
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -121,8 +121,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo-export/best/onnx/cpu
       hash: md5
-      md5: 3e101e69ac72dc3109be7afd2b61aa4a.dir
-      size: 38532985
+      md5: 70dcbce65843be7b21c07b87a1638c17.dir
+      size: 38215733
       nfiles: 1
   export_yolo_best@onnx-mps:
     cmd:
@@ -153,8 +153,8 @@ stages:
     deps:
     - path: ./data/02_models/yolo/best/
       hash: md5
-      md5: 0e3617cd00b6a1985129110757bca1a0.dir
-      size: 44813862
+      md5: 52216f9194f58306d24d4802af43394a.dir
+      size: 44857368
       nfiles: 24
     - path: ./scripts/model/yolo/export.py
       hash: md5
@@ -163,7 +163,7 @@ stages:
     outs:
     - path: ./data/02_models/yolo-export/best/ncnn/cpu
       hash: md5
-      md5: f6f1f2b316198f427a51b3b8335e7b7c.dir
+      md5: eb6218fa84411a1bd8a24190d286331f.dir
       size: 38001906
       nfiles: 5
   export_yolo_best@ncnn-mps:
@@ -257,7 +257,7 @@ stages:
       nfiles: 11478
     - path: ./data/02_models/yolo/best/weights/best.pt
       hash: md5
-      md5: 550d1b91fb93e52cf233166b03405a10
+      md5: 1074afc0b91d99370d107a17b8c5b29f
       size: 19225626
     - path: predict_sequential.py
       hash: md5
@@ -266,8 +266,8 @@ stages:
     outs:
     - path: ./data/03_reporting/sequential/predictions_labels_val
       hash: md5
-      md5: 796a49a2802fa773158ca168a680f12c.dir
-      size: 109228
+      md5: 30d4cd6007438c36d3a7cc01af62cbdb.dir
+      size: 127793
       nfiles: 3340
   optimize_sequential_val:
     cmd:
@@ -278,8 +278,8 @@ stages:
     deps:
     - path: ./data/03_reporting/sequential/predictions_labels_val
       hash: md5
-      md5: 796a49a2802fa773158ca168a680f12c.dir
-      size: 109228
+      md5: 30d4cd6007438c36d3a7cc01af62cbdb.dir
+      size: 127793
       nfiles: 3340
     - path: optimize_sequential.py
       hash: md5
@@ -288,9 +288,9 @@ stages:
     outs:
     - path: ./data/03_reporting/sequential/grid_search_val.tsv
       hash: md5
-      md5: aa6f9da227c79d6ffa2903e7b9a3d18b
-      size: 1873
+      md5: 027945e7c6a9b512fbc82ed6ec721249
+      size: 1913
     - path: ./data/03_reporting/sequential/grid_search_val_top20.tsv
       hash: md5
-      md5: dd8e0aa4c8bc678deb27acbdd911c065
-      size: 973
+      md5: 933b10550f566f4e38d5f9dabe10cb9b
+      size: 1006
