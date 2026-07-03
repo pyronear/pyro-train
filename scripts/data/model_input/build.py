@@ -42,6 +42,11 @@ def make_cli_parser() -> argparse.ArgumentParser:
         type=int,
     )
     parser.add_argument(
+        "--exclude-background",
+        help="Exclude background images (empty label files) from the train split to train an ultra-sensitive model",
+        action="store_true",
+    )
+    parser.add_argument(
         "-log",
         "--loglevel",
         default="warning",
@@ -111,11 +116,20 @@ def copy_data(input_dir: Path, output_dir: Path) -> None:
         )
 
 
+def is_background(label_filepath: Path) -> bool:
+    """
+    Return whether the given label file corresponds to a background image,
+    ie. a missing or empty label file (no smoke annotation).
+    """
+    return not label_filepath.exists() or label_filepath.stat().st_size == 0
+
+
 def sample_dataset(
     input_dir: Path,
     output_dir: Path,
     sampling_ratio: float = 0.1,
     random_seed: int = 0,
+    exclude_background: bool = False,
 ) -> list[dict]:
     """
     Return a downsampled list of images and labels for the given
@@ -124,6 +138,9 @@ def sample_dataset(
     Each element in the returned list has the following keys:
     - to: Path - where the image/label comes from
     - from: Path - where the image/label should be copied over - using the provided `output_dir`
+
+    When `exclude_background` is set, background images (empty label files)
+    are dropped from the train split to train an ultra-sensitive model.
     """
     assert 0 <= sampling_ratio <= 1.0, "sampling ratio should be between 0 and 1"
 
@@ -132,6 +149,19 @@ def sample_dataset(
         labels_split_dir = input_dir / "labels" / split
         images_split_dir = input_dir / "images" / split
         images_filepaths = list(images_split_dir.glob("*.jpg"))
+        # Drop background images (empty labels) from the train split only, so
+        # that the val split stays intact for a comparable evaluation.
+        if exclude_background and split == "train":
+            n_before = len(images_filepaths)
+            images_filepaths = [
+                fp
+                for fp in images_filepaths
+                if not is_background(labels_split_dir / f"{fp.stem}.txt")
+            ]
+            logging.info(
+                f"Excluded {n_before - len(images_filepaths)} background images "
+                f"from the {split} split ({len(images_filepaths)} remaining)"
+            )
         n_images = len(images_filepaths)
         k = int(n_images * sampling_ratio)
         # For the val split we do not subsample as we want to eval on the same data as in the full
@@ -202,6 +232,7 @@ if __name__ == "__main__":
                 output_dir=output_dir / "datasets",
                 sampling_ratio=sampling_ratio,
                 random_seed=random_seed,
+                exclude_background=args["exclude_background"],
             )
         )
         write_data_yaml(output_dir / "datasets" / "data.yaml")
