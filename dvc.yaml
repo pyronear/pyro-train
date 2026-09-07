@@ -3,11 +3,11 @@ stages:
     cmd:
     - >-
       uv run dvc get https://github.com/pyronear/pyro-dataset
-      data/processed/yolo_train_val_corrected --rev v4.0.0-corrected
+      data/processed/yolo_train_val --rev v4.3.0
       --out ./data/01_model_input/yolo_train_val
       ||
       uv run dvc get git@github.com:pyronear/pyro-dataset.git
-      data/processed/yolo_train_val_corrected --rev v4.0.0-corrected
+      data/processed/yolo_train_val --rev v4.3.0
       --out ./data/01_model_input/yolo_train_val
     outs:
     - ./data/01_model_input/yolo_train_val
@@ -53,11 +53,11 @@ stages:
     cmd:
     - >-
       uv run dvc get https://github.com/pyronear/pyro-dataset
-      data/processed/sequential_train_val/val --rev v4.0.0-corrected
+      data/processed/sequential_train_val/val --rev v4.3.0
       --out ./data/01_model_input/sequential_train_val/val
       ||
       uv run dvc get git@github.com:pyronear/pyro-dataset.git
-      data/processed/sequential_train_val/val --rev v4.0.0-corrected
+      data/processed/sequential_train_val/val --rev v4.3.0
       --out ./data/01_model_input/sequential_train_val/val
     outs:
     - ./data/01_model_input/sequential_train_val/val

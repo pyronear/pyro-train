@@ -74,7 +74,7 @@ jobs:
       - name: Download test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/yolo_test_corrected --rev v4.0.0-corrected \
+            data/processed/yolo_test --rev v4.3.0 \
             --out ./data/test/yolo_test
 
       - name: Run evaluation
@@ -90,7 +90,7 @@ jobs:
       - name: Download sequential test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/sequential_test --rev v4.0.0-corrected \
+            data/processed/sequential_test --rev v4.3.0 \
             --out ./data/test/sequential_test
 
       - name: Run sequential predictions on test
@@ -238,7 +238,7 @@ jobs:
           {opt_table}
 
           {baseline_note}
-          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v4.0.0-corrected""")
+          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v4.3.0""")
           PYEOF
           )
 
