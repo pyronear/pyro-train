@@ -5,6 +5,14 @@ on:
     branches:
       - "train_*"
 
+# Both the model pointer and the results are force-pushed to the same
+# result branch, so two overlapping runs on one train_* branch let the
+# slower, older one overwrite the newer. Superseding also frees the GPU
+# instance the abandoned run would keep for hours.
+concurrency:
+  group: train-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   start-runner:
     name: Start EC2 GPU runner
@@ -78,7 +86,9 @@ jobs:
 
           git checkout -B "$RESULT_BRANCH"
           git add dvc.lock
-          git commit -m "chore: trained model from $GITHUB_REF_NAME [skip ci]"
+          # Empty when train_yolo_best was cached and dvc.lock already
+          # recorded this hash; git treats that as an error.
+          git diff --cached --quiet || git commit -m "chore: trained model from $GITHUB_REF_NAME [skip ci]"
           git push --force origin "$RESULT_BRANCH"
 
       - name: Run the rest of the pipeline
