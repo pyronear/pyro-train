@@ -65,6 +65,22 @@ jobs:
       - name: Push the trained model to DVC remote
         run: uv run dvc push
 
+      # The blob is content-addressed, so uploading it is not enough: without
+      # the dvc.lock that names its hash, nobody can find it again. Publish the
+      # pointer here too, or a later failure leaves the weights in S3 with no
+      # way to reach them, and the next run retrains from scratch anyway.
+      - name: Publish the model pointer to the result branch
+        run: |
+          RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B "$RESULT_BRANCH"
+          git add dvc.lock
+          git commit -m "chore: trained model from $GITHUB_REF_NAME [skip ci]"
+          git push --force origin "$RESULT_BRANCH"
+
       - name: Run the rest of the pipeline
         run: uv run dvc repro
 
@@ -79,9 +95,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git checkout -b "$RESULT_BRANCH"
+          git checkout -B "$RESULT_BRANCH"
           git add dvc.lock
-          git commit -m "chore: training results from $BRANCH_NAME [skip ci]"
+          # The model pointer was already committed above, so this sees only
+          # what the remaining stages added — nothing at all when they were
+          # all cached, and `git commit` treats an empty diff as an error.
+          git diff --cached --quiet || git commit -m "chore: training results from $BRANCH_NAME [skip ci]"
           git push --force origin "$RESULT_BRANCH"
 
       - name: Download test dataset
