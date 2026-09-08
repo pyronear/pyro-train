@@ -39,3 +39,8 @@ build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.pytest.ini_options]
+# scripts/ is not an installed package, unlike pyro_train; putting the repo
+# root on the path lets tests import the pipeline scripts directly.
+pythonpath = ["."]
