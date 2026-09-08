@@ -5,6 +5,14 @@ on:
     branches:
       - "train_*"
 
+# Both the model pointer and the results are force-pushed to the same
+# result branch, so two overlapping runs on one train_* branch let the
+# slower, older one overwrite the newer. Superseding also frees the GPU
+# instance the abandoned run would keep for hours.
+concurrency:
+  group: train-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   start-runner:
     name: Start EC2 GPU runner
@@ -52,7 +60,38 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run pipeline
+      # Train first and push the weights immediately. The runner is ephemeral,
+      # so anything not in the remote when the job ends is gone — and the
+      # stages after training are the fragile ones: minutes of grid search and
+      # export, against ten hours of GPU that depend only on data already on
+      # disk. Pushing between the two stops a late failure from destroying the
+      # model, which is what happened on 2026-09-07: train_yolo_best succeeded
+      # twice, and both models died with the runner.
+      - name: Train
+        run: uv run dvc repro train_yolo_best
+
+      - name: Push the trained model to DVC remote
+        run: uv run dvc push
+
+      # The blob is content-addressed, so uploading it is not enough: without
+      # the dvc.lock that names its hash, nobody can find it again. Publish the
+      # pointer here too, or a later failure leaves the weights in S3 with no
+      # way to reach them, and the next run retrains from scratch anyway.
+      - name: Publish the model pointer to the result branch
+        run: |
+          RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B "$RESULT_BRANCH"
+          git add dvc.lock
+          # Empty when train_yolo_best was cached and dvc.lock already
+          # recorded this hash; git treats that as an error.
+          git diff --cached --quiet || git commit -m "chore: trained model from $GITHUB_REF_NAME [skip ci]"
+          git push --force origin "$RESULT_BRANCH"
+
+      - name: Run the rest of the pipeline
         run: uv run dvc repro
 
       - name: Push artifacts to DVC remote
@@ -66,9 +105,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git checkout -b "$RESULT_BRANCH"
+          git checkout -B "$RESULT_BRANCH"
           git add dvc.lock
-          git commit -m "chore: training results from $BRANCH_NAME [skip ci]"
+          # The model pointer was already committed above, so this sees only
+          # what the remaining stages added — nothing at all when they were
+          # all cached, and `git commit` treats an empty diff as an error.
+          git diff --cached --quiet || git commit -m "chore: training results from $BRANCH_NAME [skip ci]"
           git push --force origin "$RESULT_BRANCH"
 
       - name: Download test dataset

@@ -34,7 +34,15 @@ import ssl  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from PIL import Image  # noqa: E402
+import pyroengine.engine  # noqa: E402
 from pyroengine.engine import Engine  # noqa: E402
+
+# Engine.__init__ builds a Classifier, which downloads a detector from
+# HuggingFace. Nothing here runs it: _make_engine swaps engine.model for
+# _PassthroughModel one line later, because this script replays predictions
+# computed upstream. The download was always dead weight, and became fatal once
+# the model repository stopped answering anonymously (HTTP 401).
+pyroengine.engine.Classifier = _Stub
 
 ssl._create_default_https_context = ssl._create_unverified_context  # noqa: SLF001
 logging.getLogger().setLevel(logging.WARNING)
