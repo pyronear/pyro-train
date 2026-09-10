@@ -60,6 +60,24 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Restore the trained model checkpoint
+        run: |
+          RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
+          RESULT_REF=$(git ls-remote --heads origin "refs/heads/$RESULT_BRANCH")
+          if [ -n "$RESULT_REF" ]; then
+            git fetch --no-tags --depth=1 origin "$RESULT_BRANCH"
+            # ponytail: require identical code/config; narrow this comparison
+            # only if reuse across code changes becomes necessary.
+            if git diff --quiet HEAD FETCH_HEAD -- . ':(exclude)dvc.lock' ':(exclude)results'; then
+              git restore --source=FETCH_HEAD --worktree dvc.lock
+              # Fetch explicitly so a missing checkpoint fails before training
+              # instead of silently spending another GPU run on the same inputs.
+              uv run dvc pull --with-deps train_yolo_best
+            else
+              echo "Checkpoint code/config differs; training from the current branch."
+            fi
+          fi
+
       # Train first and push the weights immediately. The runner is ephemeral,
       # so anything not in the remote when the job ends is gone — and the
       # stages after training are the fragile ones: minutes of grid search and
