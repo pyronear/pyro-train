@@ -61,9 +61,9 @@ stages:
     deps:
     - path: ./data/01_model_input/yolo_train_val
       hash: md5
-      md5: 409302377938ce2a82f5338f3145cbbc.dir
-      size: 1914167911
-      nfiles: 32201
+      md5: da8f531db6ac70886c2793c3a6f18f16.dir
+      size: 2321533653
+      nfiles: 37609
     - path: ./scripts/data/model_input/build.py
       hash: md5
       md5: 7607af10f59267cf9859cb1d372aff26
@@ -79,8 +79,8 @@ stages:
     outs:
     - path: ./data/02_models/yolo/best
       hash: md5
-      md5: 0e3617cd00b6a1985129110757bca1a0.dir
-      size: 44813862
+      md5: 43df3b52671b31dff13034cd7751eed0.dir
+      size: 45158669
       nfiles: 24
   build_manifest_yolo_best:
     cmd:
@@ -190,17 +190,16 @@ stages:
   fetch_model_input:
     cmd:
     - uv run dvc get https://github.com/pyronear/pyro-dataset 
-      data/processed/yolo_train_val_corrected --rev v4.0.0-corrected --out 
+      data/processed/yolo_train_val --rev v4.3.0 --out 
       ./data/01_model_input/yolo_train_val || uv run dvc get 
-      git@github.com:pyronear/pyro-dataset.git 
-      data/processed/yolo_train_val_corrected --rev v4.0.0-corrected --out 
-      ./data/01_model_input/yolo_train_val
+      git@github.com:pyronear/pyro-dataset.git data/processed/yolo_train_val 
+      --rev v4.3.0 --out ./data/01_model_input/yolo_train_val
     outs:
     - path: ./data/01_model_input/yolo_train_val
       hash: md5
-      md5: 409302377938ce2a82f5338f3145cbbc.dir
-      size: 1914167911
-      nfiles: 32201
+      md5: da8f531db6ac70886c2793c3a6f18f16.dir
+      size: 2321533653
+      nfiles: 37609
   fetch_sequential_val:
     cmd:
     - uv run dvc get https://github.com/pyronear/pyro-dataset 
