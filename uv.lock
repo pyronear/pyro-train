@@ -1464,7 +1464,7 @@ wheels = [
 
 [[package]]
 name = "fiftyone"
-version = "1.13.4"
+version = "1.14.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1516,9 +1516,9 @@ dependencies = [
     { name = "voxel51-eta" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ed/11/d7c3ae7930789a1447d36d3d1bb40ee91a708b504d1e59bf4bf69f59d021/fiftyone-1.13.4.tar.gz", hash = "sha256:6d2691965260c56a25e8d1e041a258d3859c2227f0a4f04b6e830a7d1f3d1fd5", size = 11638856, upload_time = "2026-03-09T17:49:13.077Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/a4/7f19375533419c3972a5e87cf602baad27b1e47e4e3f9d92c0b204b7f90a/fiftyone-1.14.2.tar.gz", hash = "sha256:7188ab321b15ab0974d29bf71286cb2a906955120f895dfebfbc9560bcbc5b2a", size = 17506274, upload_time = "2026-04-23T20:35:46.346Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/00/2d/dce392a423a10e21e8bfb198525748453e5d8dfdc5c91238bc9c44ad7710/fiftyone-1.13.4-py3-none-any.whl", hash = "sha256:5a74d3bd9a1bc4a608af37b5e52e26a656401eae9a9315b9f6ea4b5bd686aba8", size = 11777014, upload_time = "2026-03-09T17:49:10.187Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/e2/963a8bb78329c60569738eee961e235b79e67306889c7b9d926e26e02123/fiftyone-1.14.2-py3-none-any.whl", hash = "sha256:58ece89c827abbd95c426175a123f245a37cfff2cabd5aed54b41f975487c183", size = 17721990, upload_time = "2026-04-23T20:35:42.822Z" },
 ]
 
 [[package]]
@@ -4687,7 +4687,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "albumentations", specifier = ">=1.4.0,<2.0" },
-    { name = "fiftyone", specifier = ">=1.13.4" },
+    { name = "fiftyone", specifier = ">=1.14.2,<1.15" },
     { name = "huggingface-hub", specifier = ">=1.8.0" },
     { name = "ncnn", specifier = ">=1.0.20250503" },
     { name = "onnx", specifier = ">=1.18.0" },
@@ -5645,11 +5645,11 @@ wheels = [
 
 [[package]]
 name = "tabulate"
-version = "0.10.0"
+version = "0.9.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/46/58/8c37dea7bbf769b20d58e7ace7e5edfe65b849442b00ffcdd56be88697c6/tabulate-0.10.0.tar.gz", hash = "sha256:e2cfde8f79420f6deeffdeda9aaec3b6bc5abce947655d17ac662b126e48a60d", size = 91754, upload_time = "2026-03-04T18:55:34.402Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ec/fe/802052aecb21e3797b8f7902564ab6ea0d60ff8ca23952079064155d1ae1/tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c", size = 81090, upload_time = "2022-10-06T17:21:48.54Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/99/55/db07de81b5c630da5cbf5c7df646580ca26dfaefa593667fc6f2fe016d2e/tabulate-0.10.0-py3-none-any.whl", hash = "sha256:f0b0622e567335c8fabaaa659f1b33bcb6ddfe2e496071b743aa113f8774f2d3", size = 39814, upload_time = "2026-03-04T18:55:31.284Z" },
+    { url = "https://files.pythonhosted.org/packages/40/44/4a5f08c96eb108af5cb50b41f76142f0afa346dfa99d5296fe7202a11854/tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f", size = 35252, upload_time = "2022-10-06T17:21:44.262Z" },
 ]
 
 [[package]]
