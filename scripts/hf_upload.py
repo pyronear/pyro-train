@@ -155,8 +155,10 @@ tar -xzf ncnn_cpu.tar.gz
 ```python
 from huggingface_hub import snapshot_download
 
-local_dir = snapshot_download(repo_id="{repo_id}")  # latest
-local_dir = snapshot_download(repo_id="{repo_id}", revision="{version}")  # pinned
+# latest release
+local_dir = snapshot_download(repo_id="{repo_id}")
+# or pin a version
+local_dir = snapshot_download(repo_id="{repo_id}", revision="{version}")
 ```
 
 ### Pyronear engine (sequential smoke detection)
@@ -202,23 +204,15 @@ if __name__ == "__main__":
         # best.pt
         shutil.copy(args.model_pt, tmp_dir / "best.pt")
 
-        # ONNX cpu — archived
-        onnx_src = args.exports_dir / "onnx" / "cpu"
-        if onnx_src.exists():
+        # Exports are required: the repo is shared across releases and
+        # upload_folder keeps remote files absent locally, so a missing export
+        # would silently leave the previous release's archive under the new tag.
+        for name in ("onnx", "ncnn"):
+            src = args.exports_dir / name / "cpu"
+            assert src.exists(), f"{name.upper()} export not found: {src}"
             shutil.make_archive(
-                str(tmp_dir / "onnx_cpu"), "gztar", root_dir=onnx_src, base_dir="."
+                str(tmp_dir / f"{name}_cpu"), "gztar", root_dir=src, base_dir="."
             )
-        else:
-            logger.warning(f"ONNX export not found: {onnx_src}")
-
-        # NCNN cpu — zipped
-        ncnn_src = args.exports_dir / "ncnn" / "cpu"
-        if ncnn_src.exists():
-            shutil.make_archive(
-                str(tmp_dir / "ncnn_cpu"), "gztar", root_dir=ncnn_src, base_dir="."
-            )
-        else:
-            logger.warning(f"NCNN export not found: {ncnn_src}")
 
         # README / model card
         card = make_model_card(repo_id, args.version, args.release_name, manifest)
@@ -231,15 +225,23 @@ if __name__ == "__main__":
         else:
             HF_TOKEN = os.getenv("HF_TOKEN")
             api = HfApi(token=HF_TOKEN or None)  # None → use cached login
+            tags = {t.name for t in api.list_repo_refs(repo_id, repo_type="model").tags}
+            assert args.version not in tags, (
+                f"{args.version} already released on {repo_id}"
+            )
             logger.info("Uploading files...")
-            api.upload_folder(
+            commit = api.upload_folder(
                 folder_path=str(tmp_dir),
                 repo_id=repo_id,
                 repo_type="model",
                 commit_message=f"{args.version} ({args.release_name.replace(' ', '-')})",
             )
+            # Tag the exact commit we pushed, not whatever main points to now
             api.create_tag(
-                repo_id=repo_id, tag=args.version, repo_type="model", exist_ok=True
+                repo_id=repo_id,
+                tag=args.version,
+                repo_type="model",
+                revision=commit.oid,
             )
             print(
                 f"\nModel uploaded: https://huggingface.co/{repo_id} (tag: {args.version})"
