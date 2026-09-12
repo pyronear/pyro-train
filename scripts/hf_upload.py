@@ -1,8 +1,8 @@
 """
 Upload a trained Pyronear YOLO model to Hugging Face Hub.
 
-Creates a model repo named `{hf-org}/{model_type}_{release_name}_{version}`
-and uploads:
+Pushes a new commit tagged `{version}` to an existing model repo
+(default `pyronear/yolov11s`) with:
   - best.pt          (PyTorch weights)
   - onnx_cpu.tar.gz  (ONNX export, cpu)
   - ncnn/            (NCNN export, cpu)
@@ -13,8 +13,7 @@ Usage:
     export HF_TOKEN=hf_...
     uv run python scripts/hf_upload.py \
         --version v5.2.0 \
-        --release-name "nimble narwhal" \
-        --hf-org pyronear
+        --release-name "nimble narwhal"
 """
 
 import argparse
@@ -32,23 +31,41 @@ from pyro_train.data.utils import yaml_read
 def make_cli_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", type=str, required=True, help="e.g. v5.2.0")
-    parser.add_argument("--release-name", type=str, required=True, help="e.g. 'nimble narwhal'")
-    parser.add_argument("--hf-org", type=str, default="pyronear", help="HuggingFace organisation")
-    parser.add_argument("--manifest", type=Path, default=Path("./data/03_reporting/yolo/best/manifest.yaml"))
-    parser.add_argument("--model-pt", type=Path, default=Path("./data/02_models/yolo/best/weights/best.pt"))
-    parser.add_argument("--exports-dir", type=Path, default=Path("./data/02_models/yolo-export/best/"))
-    parser.add_argument("--output-dir", type=Path, default=None, help="If set, copy staged files here instead of uploading")
+    parser.add_argument(
+        "--release-name", type=str, required=True, help="e.g. 'nimble narwhal'"
+    )
+    parser.add_argument(
+        "--repo-id",
+        type=str,
+        default="pyronear/yolov11s",
+        help="Existing HuggingFace model repo",
+    )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=Path("./data/03_reporting/yolo/best/manifest.yaml"),
+    )
+    parser.add_argument(
+        "--model-pt",
+        type=Path,
+        default=Path("./data/02_models/yolo/best/weights/best.pt"),
+    )
+    parser.add_argument(
+        "--exports-dir", type=Path, default=Path("./data/02_models/yolo-export/best/")
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="If set, copy staged files here instead of uploading",
+    )
     parser.add_argument("-log", "--loglevel", default="info")
     return parser
 
 
-def get_repo_id(hf_org: str, version: str, release_name: str, manifest: dict) -> str:
-    model_type = manifest["model"]["model_type"].split(".")[0]
-    slug = release_name.replace(" ", "-")
-    return f"{hf_org}/{model_type}_{slug}_{version}"
-
-
-def make_model_card(repo_id: str, version: str, release_name: str, manifest: dict) -> ModelCard:
+def make_model_card(
+    repo_id: str, version: str, release_name: str, manifest: dict
+) -> ModelCard:
     model_type = manifest["model"]["model_type"].split(".")[0]
     train_args = manifest.get("train_run_args", {})
     epochs = train_args.get("epochs", "?")
@@ -72,7 +89,10 @@ def make_model_card(repo_id: str, version: str, release_name: str, manifest: dic
 Pyronear YOLO model for early wildfire smoke detection.
 
 **Release name:** {release_name.title()}
-**Version:** {version}
+**Latest version:** {version}
+
+Each release is a git tag on this repo (e.g. `{version}`). Pin a version with
+`revision="{version}"` in `hf_hub_download` / `snapshot_download`.
 
 ## Model details
 
@@ -135,7 +155,8 @@ tar -xzf ncnn_cpu.tar.gz
 ```python
 from huggingface_hub import snapshot_download
 
-local_dir = snapshot_download(repo_id="{repo_id}")
+local_dir = snapshot_download(repo_id="{repo_id}")  # latest
+local_dir = snapshot_download(repo_id="{repo_id}", revision="{version}")  # pinned
 ```
 
 ### Pyronear engine (sequential smoke detection)
@@ -169,7 +190,7 @@ if __name__ == "__main__":
     assert args.model_pt.exists(), f"Model weights not found: {args.model_pt}"
 
     manifest = yaml_read(args.manifest)
-    repo_id = get_repo_id(args.hf_org, args.version, args.release_name, manifest)
+    repo_id = args.repo_id
     logger.info(f"Target repo: https://huggingface.co/{repo_id}")
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -184,14 +205,18 @@ if __name__ == "__main__":
         # ONNX cpu — archived
         onnx_src = args.exports_dir / "onnx" / "cpu"
         if onnx_src.exists():
-            shutil.make_archive(str(tmp_dir / "onnx_cpu"), "gztar", root_dir=onnx_src, base_dir=".")
+            shutil.make_archive(
+                str(tmp_dir / "onnx_cpu"), "gztar", root_dir=onnx_src, base_dir="."
+            )
         else:
             logger.warning(f"ONNX export not found: {onnx_src}")
 
         # NCNN cpu — zipped
         ncnn_src = args.exports_dir / "ncnn" / "cpu"
         if ncnn_src.exists():
-            shutil.make_archive(str(tmp_dir / "ncnn_cpu"), "gztar", root_dir=ncnn_src, base_dir=".")
+            shutil.make_archive(
+                str(tmp_dir / "ncnn_cpu"), "gztar", root_dir=ncnn_src, base_dir="."
+            )
         else:
             logger.warning(f"NCNN export not found: {ncnn_src}")
 
@@ -206,13 +231,16 @@ if __name__ == "__main__":
         else:
             HF_TOKEN = os.getenv("HF_TOKEN")
             api = HfApi(token=HF_TOKEN or None)  # None → use cached login
-            api.create_repo(repo_id=repo_id, repo_type="model", exist_ok=True)
-            logger.info(f"Repo ready: {repo_id}")
             logger.info("Uploading files...")
             api.upload_folder(
                 folder_path=str(tmp_dir),
                 repo_id=repo_id,
                 repo_type="model",
-                commit_message=f"Upload {args.release_name.title()} {args.version}",
+                commit_message=f"{args.version} ({args.release_name.replace(' ', '-')})",
             )
-            print(f"\nModel uploaded: https://huggingface.co/{repo_id}")
+            api.create_tag(
+                repo_id=repo_id, tag=args.version, repo_type="model", exist_ok=True
+            )
+            print(
+                f"\nModel uploaded: https://huggingface.co/{repo_id} (tag: {args.version})"
+            )
