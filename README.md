@@ -463,16 +463,19 @@ uv run huggingface-cli login
 ```sh
 uv run python scripts/hf_upload.py \
   --version v6.0.0 \
-  --release-name "nimble narwhal" \
-  --hf-org pyronear
+  --release-name "nimble narwhal"
 ```
 
-This will create `pyronear/{model_type}_{release-name}_{version}` on Hugging Face and upload:
+This pushes a new commit to the existing `pyronear/yolov11s` repo on Hugging
+Face (override with `--repo-id`), tags it `{version}`, and uploads:
 - `best.pt` — PyTorch weights
-- `best.onnx` — ONNX export (cpu)
-- `ncnn_cpu.zip` — NCNN export (cpu)
+- `onnx_cpu.tar.gz` — ONNX export (cpu)
+- `ncnn_cpu.tar.gz` — NCNN export (cpu)
 - `manifest.yaml` — training manifest
 - `README.md` — auto-generated model card
+
+`main` always holds the latest release. Pin a version with
+`revision="v6.0.0"` in `hf_hub_download` / `snapshot_download`.
 
 ### 3. (Optional) Export locally without uploading
 
@@ -480,7 +483,6 @@ This will create `pyronear/{model_type}_{release-name}_{version}` on Hugging Fac
 uv run python scripts/hf_upload.py \
   --version v6.0.0 \
   --release-name "nimble narwhal" \
-  --hf-org pyronear \
   --output-dir ./hf_export/
 ```
 
