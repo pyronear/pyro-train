@@ -16,7 +16,7 @@ dependencies = [
     "tqdm>=4.66.0",
     "pyroengine @ git+https://github.com/pyronear/pyro-engine.git",
     "pyroclient @ git+https://github.com/pyronear/pyro-api.git#subdirectory=client",
-    "fiftyone>=1.13.4",
+    "fiftyone>=1.14.2,<1.15",
     "huggingface-hub>=1.8.0",
     "albumentations>=1.4.0,<2.0",
 ]
