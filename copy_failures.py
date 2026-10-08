@@ -8,6 +8,7 @@ FP: fp sequences the engine falsely alerted on
 
 import argparse
 import json
+import math
 import shutil
 import sys
 from collections import deque
@@ -104,12 +105,40 @@ def _reset_state(engine: Engine, cam_key: str) -> None:
     engine.occlusion_masks[cam_key] = (None, {}, 0)  # noqa: SLF001
 
 
-def _evaluate_sequence(engine: Engine, frames: list[np.ndarray], cam_key: str) -> bool:
+def _evaluate_sequence(engine: Engine, frames: list[np.ndarray], cam_key: str) -> int | None:
+    """Zero-based index of the frame the engine alerts on, or None."""
     _reset_state(engine, cam_key)
-    for fake_pred in frames:
+    for i, fake_pred in enumerate(frames):
         if engine.predict(_DUMMY_FRAME, cam_id=cam_key, fake_pred=fake_pred) > engine.conf_thresh:
-            return True
-    return False
+            return i
+    return None
+
+
+def wilson_ci95(successes: int, n: int) -> list[float] | None:
+    """Wilson score 95% interval for a proportion; None when n == 0."""
+    if n == 0:
+        return None
+    z = 1.96
+    p = successes / n
+    denom = 1 + z * z / n
+    center = (p + z * z / (2 * n)) / denom
+    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
+    return [round(max(center - half, 0.0), 4), round(min(center + half, 1.0), 4)]
+
+
+def detected_within_frames(
+    triggers: list[int | None], ks: tuple[int, ...] = (2, 3, 5)
+) -> dict[str, float | None]:
+    """Share of all wildfire sequences alerted within their first k frames.
+
+    Missed wildfire counts as not detected, so a model is not rewarded for
+    missing the hard ones. Same definition as temporal-model's eval.
+    """
+    return {
+        str(k): round(sum(t is not None and t < k for t in triggers) / len(triggers), 4)
+        if triggers else None
+        for k in ks
+    }
 
 
 def _parse_gt_label_file(path: Path) -> list[tuple[float, float, float, float]]:
@@ -193,9 +222,11 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", type=Path, default=Path("failures"))
     parser.add_argument("--nb-consecutive-frames", type=int, default=5)
     parser.add_argument("--conf-thresh", type=float, default=0.2)
-    parser.add_argument("--min-frames", type=int, default=8)
+    parser.add_argument("--min-frames", type=int, default=0)
     parser.add_argument("--output-json", type=Path, default=None,
                         help="If set, save evaluation metrics as JSON to this path")
+    parser.add_argument("--output-predictions", type=Path, default=None,
+                        help="If set, write each sequence's decision here, to pair two models")
     return parser
 
 
@@ -217,9 +248,14 @@ if __name__ == "__main__":
 
     fn_seqs, fp_seqs = [], []
     tp = fn = fp = tn = 0
+    predictions, wildfire_triggers = [], []
     for (category, sequence), frames in grouped.items():
-        alerted = _evaluate_sequence(engine, frames, sequence)
+        trigger = _evaluate_sequence(engine, frames, sequence)
+        alerted = trigger is not None
+        predictions.append({"category": category, "sequence": sequence,
+                            "alerted": alerted, "trigger_frame": trigger})
         if category == "wildfire":
+            wildfire_triggers.append(trigger)
             if alerted: tp += 1
             else:
                 fn += 1
@@ -264,17 +300,25 @@ if __name__ == "__main__":
     if args.output_json is not None:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
         def _safe(v: float) -> float | None:
-            import math
             return round(v, 4) if not math.isnan(v) else None
 
+        # No precision or F1: the test smoke/FP ratio is arbitrary, so both
+        # would move with it.
         metrics = {
             "nb_consecutive_frames": args.nb_consecutive_frames,
             "conf_thresh": args.conf_thresh,
+            "num_sequences": len(grouped),
             "tp": tp, "fn": fn, "fp": fp, "tn": tn,
             "recall": _safe(recall),
             "fpr": _safe(fpr),
-            "precision": _safe(precision),
-            "f1": _safe(f1),
+            "recall_ci95": wilson_ci95(tp, tp + fn),
+            "fpr_ci95": wilson_ci95(fp, fp + tn),
+            "detected_within_frames": detected_within_frames(wildfire_triggers),
         }
         args.output_json.write_text(json.dumps(metrics, indent=2))
         print(f"Metrics → {args.output_json}")
+
+    if args.output_predictions is not None:
+        args.output_predictions.parent.mkdir(parents=True, exist_ok=True)
+        args.output_predictions.write_text(json.dumps(predictions, indent=2))
+        print(f"Predictions → {args.output_predictions}")
