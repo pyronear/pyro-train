@@ -312,7 +312,7 @@ dvc pull data/01_model_input/sequential_train_val/val
 
 ```sh
 tail -n +2 data/03_reporting/sequential/grid_search_val.tsv | head -1
-# columns: nb_consecutive_frames  conf_thresh  precision  recall  f1  ...
+# best row by Youden's J (recall − FPR); columns: nb_consecutive_frames  conf_thresh  tp  fn  fp  tn  ...  youden
 ```
 
 **3. Collect val failures** (replace `NB_FRAMES` and `CONF` with values from step 2):
@@ -360,7 +360,7 @@ dvc pull data/03_reporting/sequential/grid_search_val.tsv
 
 ```sh
 tail -n +2 data/03_reporting/sequential/grid_search_val.tsv | head -1
-# columns: nb_consecutive_frames  conf_thresh  precision  recall  f1  ...
+# best row by Youden's J (recall − FPR); columns: nb_consecutive_frames  conf_thresh  tp  fn  fp  tn  ...  youden
 ```
 
 **4. Run predictions on test set:**

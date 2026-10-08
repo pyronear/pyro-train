@@ -43,9 +43,18 @@ jobs:
     needs: start-runner
     runs-on: ${{ needs.start-runner.outputs.label }}
     timeout-minutes: 1440
+    env:
+      DATASET_REV: v4.3.0
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
+
+      # Pinned before training, so the baseline is the main this run started
+      # from, whatever lands on main during the hours of training.
+      - name: Pin the main commit used as baseline
+        run: |
+          git fetch --no-tags --depth=1 origin main
+          echo "MAIN_SHA=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_ENV"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -134,7 +143,7 @@ jobs:
       - name: Download test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/yolo_test --rev v4.3.0 \
+            data/processed/yolo_test --rev "$DATASET_REV" \
             --out ./data/test/yolo_test
 
       - name: Run evaluation
@@ -150,7 +159,7 @@ jobs:
       - name: Download sequential test dataset
         run: |
           uv run dvc get https://github.com/pyronear/pyro-dataset \
-            data/processed/sequential_test --rev v4.3.0 \
+            data/processed/sequential_test --rev "$DATASET_REV" \
             --out ./data/test/sequential_test
 
       - name: Run sequential predictions on test
@@ -171,8 +180,44 @@ jobs:
             --output-dir ./data/03_reporting/sequential/failures_test \
             --nb-consecutive-frames "$NB_FRAMES" \
             --conf-thresh "$CONF_THRESH" \
-            --min-frames 8 \
-            --output-json ./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json
+            --output-json ./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json \
+            --output-predictions ./data/03_reporting/yolo/sequential/eval/predictions.json
+
+      # Deltas against numbers committed on main break whenever the test set or
+      # the eval code changes, so main's model is scored again here, on the
+      # same test sets with this branch's code, at main's own engine params.
+      - name: Score main's model on the same test sets
+        run: |
+          MAIN_MODEL=./data/02_models/yolo/main
+          MAIN_REPORT=./data/03_reporting/main
+          mkdir -p "$MAIN_REPORT"
+          uv run dvc get "https://github.com/$GITHUB_REPOSITORY" \
+            data/02_models/yolo/best/weights/best.pt --rev "$MAIN_SHA" \
+            --out "$MAIN_MODEL/weights/best.pt"
+          git show "$MAIN_SHA:results/eval_sequential_results.json" > "$MAIN_REPORT/params.json"
+          NB_FRAMES=$(uv run python -c "import json, sys; print(json.load(open(sys.argv[1]))['nb_consecutive_frames'])" "$MAIN_REPORT/params.json")
+          CONF_THRESH=$(uv run python -c "import json, sys; print(json.load(open(sys.argv[1]))['conf_thresh'])" "$MAIN_REPORT/params.json")
+          echo "main @ $MAIN_SHA: nb_consecutive_frames=$NB_FRAMES conf_thresh=$CONF_THRESH"
+
+          uv run python ./scripts/model/yolo/evaluate.py \
+            --model-dir "$MAIN_MODEL" \
+            --data ./data/test/yolo_test/data.yaml \
+            --output-dir "$MAIN_REPORT/yolo" \
+            --split test \
+            --iou 0.01 \
+            --loglevel info
+          uv run python predict_sequential.py \
+            --model-path "$MAIN_MODEL/weights/best.pt" \
+            --data-dir ./data/test/sequential_test/test \
+            --labels-dir "$MAIN_REPORT/predictions_labels_test"
+          uv run python copy_failures.py \
+            --labels-dir "$MAIN_REPORT/predictions_labels_test" \
+            --data-dir ./data/test/sequential_test/test \
+            --output-dir "$MAIN_REPORT/failures_test" \
+            --nb-consecutive-frames "$NB_FRAMES" \
+            --conf-thresh "$CONF_THRESH" \
+            --output-json "$MAIN_REPORT/eval_sequential_results.json" \
+            --output-predictions "$MAIN_REPORT/predictions.json"
 
       - name: Commit eval results to result branch
         run: |
@@ -202,105 +247,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           export RESULT_BRANCH="result_${GITHUB_REF_NAME#train_}"
-          export RESULTS=./data/03_reporting/yolo/eval/eval_results.json
-          export SEQ_RESULTS=./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json
-          export OPT_RESULTS=./data/03_reporting/sequential/grid_search_val.tsv
-
-          # Fetch baseline results from main (may not exist on first run)
-          git fetch origin main --depth=1 2>/dev/null || true
-          export BASELINE_JSON=$(git show origin/main:results/eval_results.json 2>/dev/null || echo "{}")
-          export BASELINE_SEQ_JSON=$(git show origin/main:results/eval_sequential_results.json 2>/dev/null || echo "{}")
-
-          BODY=$(uv run python - <<'PYEOF'
-          import json, os, csv
-
-          with open(os.environ["RESULTS"]) as f:
-              curr = json.load(f)
-          with open(os.environ["SEQ_RESULTS"]) as f:
-              seq = json.load(f)
-
-          baseline_json = os.environ.get("BASELINE_JSON", "{}")
-          prev = json.loads(baseline_json) if baseline_json.strip() != "{}" else None
-
-          baseline_seq_json = os.environ.get("BASELINE_SEQ_JSON", "{}")
-          prev_seq = json.loads(baseline_seq_json) if baseline_seq_json.strip() != "{}" else None
-
-          # Load top 10 optimization results
-          opt_rows = []
-          opt_path = os.environ.get("OPT_RESULTS", "")
-          if opt_path and os.path.exists(opt_path):
-              with open(opt_path) as f:
-                  reader = csv.DictReader(f, delimiter="\t")
-                  for i, row in enumerate(reader):
-                      if i >= 10:
-                          break
-                      opt_rows.append(row)
-
-          def fmt(v):
-              import math
-              return f"{v:.4f}" if v is not None and not (isinstance(v, float) and math.isnan(v)) else "N/A"
-
-          def delta(curr_val, prev_val):
-              if prev_val is None or curr_val is None:
-                  return "n/a"
-              d = curr_val - prev_val
-              return f"{'+'if d>=0 else ''}{d:.4f}"
-
-          metrics = [
-              ("mAP@50",    "map50"),
-              ("mAP@50-95", "map50_95"),
-              ("Precision", "precision"),
-              ("Recall",    "recall"),
-          ]
-          rows = "\n".join(
-              f"| {label} | {fmt(prev[key]) if prev and key in prev else 'n/a'} | {fmt(curr[key])} | {delta(curr[key], prev[key] if prev else None)} |"
-              for label, key in metrics
-          )
-
-          seq_metrics = [
-              ("Recall (TP rate)", "recall"),
-              ("FPR",              "fpr"),
-              ("F1",               "f1"),
-              ("Precision",        "precision"),
-          ]
-          seq_rows = "\n".join(
-              f"| {label} | {fmt(prev_seq[key]) if prev_seq and key in prev_seq else 'n/a'} | {fmt(seq[key])} | {delta(seq[key], prev_seq[key] if prev_seq else None)} |"
-              for label, key in seq_metrics
-          )
-          tp, fn, fp, tn = seq["tp"], seq["fn"], seq["fp"], seq["tn"]
-
-          opt_table = ""
-          if opt_rows:
-              opt_table = "## Engine parameter optimization (top 10 on val)\n\n"
-              opt_table += "| nb_frames | conf | TP | FN | FP | TN | Recall | FPR | F1 |\n"
-              opt_table += "|-----------|------|----|----|----|----|--------|-----|----|\n"
-              opt_table += "\n".join(
-                  f"| {r['nb_consecutive_frames']} | {r['conf_thresh']} | {r['tp']} | {r['fn']} | {r['fp']} | {r['tn']} | {r['recall']} | {r['fpr']} | {r['f1']} |"
-                  for r in opt_rows
-              )
-
-          baseline_note = "_(no baseline on main yet)_" if prev is None else "_(vs last committed results on main)_"
-
-          print(f"""## Evaluation results on test set
-
-          | Metric | main | current | Δ |
-          |--------|------|---------|---|
-          {rows}
-
-          ## Sequential evaluation on test (optimized params: nb_frames={seq.get('nb_consecutive_frames', 'n/a')}, conf={seq.get('conf_thresh', 'n/a')})
-
-          TP={tp} FN={fn} FP={fp} TN={tn}
-
-          | Metric | main | current | Δ |
-          |--------|------|---------|---|
-          {seq_rows}
-
-          {opt_table}
-
-          {baseline_note}
-          **Branch:** `{os.environ.get('RESULT_BRANCH', '')}` | **Test dataset:** pyronear/pyro-dataset @ v4.3.0""")
-          PYEOF
-          )
+          BODY=$(uv run python ./scripts/report_training_metrics.py \
+            --results ./data/03_reporting/yolo/eval/eval_results.json \
+            --baseline-results ./data/03_reporting/main/yolo/eval_results.json \
+            --seq-results ./data/03_reporting/yolo/sequential/eval/eval_sequential_results.json \
+            --baseline-seq-results ./data/03_reporting/main/eval_sequential_results.json \
+            --predictions ./data/03_reporting/yolo/sequential/eval/predictions.json \
+            --baseline-predictions ./data/03_reporting/main/predictions.json \
+            --grid ./data/03_reporting/sequential/grid_search_val.tsv \
+            --result-branch "$RESULT_BRANCH" \
+            --baseline-ref "$MAIN_SHA" \
+            --dataset-rev "$DATASET_REV")
 
           PR_NUMBER=$(gh pr list --head "$RESULT_BRANCH" --base main --json number --jq '.[0].number')
 
