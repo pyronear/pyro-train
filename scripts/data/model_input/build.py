@@ -55,18 +55,32 @@ def validate_parsed_args(args: dict) -> bool:
     if not args["input_dir"].exists():
         logging.error("Invalid --input-dir directory, it does not exist")
         return False
+    source, output = args["input_dir"].resolve(), args["output_dir"].resolve()
+    if source.is_relative_to(output) or output.is_relative_to(source):
+        logging.error("Input and output directories must not overlap")
+        return False
     else:
         return True
 
 
-def write_data_yaml(yaml_filepath: Path) -> None:
+def write_data_yaml(yaml_filepath: Path, source_dir: Path | None = None) -> None:
     content = {
         "train": "./train/images",
         "val": "./val/images",
-        "test": ".test/images",
         "nc": 1,
         "names": ["smoke"],
     }
+    if source_dir is not None:
+        # Keep the same JPG-only image set as the copying path.
+        for split in ("train", "val"):
+            images = sorted((source_dir / "images" / split).glob("*.jpg"))
+            # Rebuild generated caches: their size-based hashes can miss edits.
+            (source_dir / "labels" / f"{split}.cache").unlink(missing_ok=True)
+            for path in images:
+                path.with_suffix(".npy").unlink(missing_ok=True)
+            manifest = yaml_filepath.parent / f"{split}.txt"
+            manifest.write_text("".join(f"{path.absolute()}\n" for path in images))
+            content[split] = str(manifest.resolve())
     yaml_write(to=yaml_filepath, data=content)
 
 
@@ -91,24 +105,6 @@ def make_yolov8_folder_structure(dir: Path) -> None:
     for split in ["train", "val", "test"]:
         os.makedirs(dir / "datasets" / split / "images", exist_ok=True)
         os.makedirs(dir / "datasets" / split / "labels", exist_ok=True)
-
-
-def copy_data(input_dir: Path, output_dir: Path) -> None:
-    """
-    Copy over all data from `input_dir` to `output_dir` using the YOLOv8
-    folder structure conventions.
-    """
-    for split in ["train", "val"]:
-        shutil.copytree(
-            src=input_dir / "images" / split,
-            dst=output_dir / split / "images",
-            dirs_exist_ok=True,
-        )
-        shutil.copytree(
-            src=input_dir / "labels" / split,
-            dst=output_dir / split / "labels",
-            dirs_exist_ok=True,
-        )
 
 
 def sample_dataset(
@@ -195,15 +191,19 @@ if __name__ == "__main__":
         shutil.rmtree(output_dir, ignore_errors=True)
         make_yolov8_folder_structure(output_dir)
 
-        logging.info(f"Creating {sampling_ratio*100:.0f}% sample at {output_dir}")
-        run_file_copy(
-            sample_dataset(
-                input_dir=input_dir,
-                output_dir=output_dir / "datasets",
-                sampling_ratio=sampling_ratio,
-                random_seed=random_seed,
+        logging.info(f"Creating {sampling_ratio * 100:.0f}% sample at {output_dir}")
+        if sampling_ratio != 1:
+            run_file_copy(
+                sample_dataset(
+                    input_dir=input_dir,
+                    output_dir=output_dir / "datasets",
+                    sampling_ratio=sampling_ratio,
+                    random_seed=random_seed,
+                )
             )
+        write_data_yaml(
+            output_dir / "datasets" / "data.yaml",
+            source_dir=input_dir if sampling_ratio == 1 else None,
         )
-        write_data_yaml(output_dir / "datasets" / "data.yaml")
 
         exit(0)
