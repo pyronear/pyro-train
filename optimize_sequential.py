@@ -158,6 +158,8 @@ def run_grid(
                 else None
             )
             fpr = fp / (fp + tn) if (fp + tn) > 0 else None
+            # Youden's J: unlike F1, it does not move with the val smoke/FP ratio.
+            youden = recall - fpr if recall is not None and fpr is not None else None
 
             results.append({
                 "nb_consecutive_frames": nb_frames,
@@ -167,6 +169,7 @@ def run_grid(
                 "recall": round(recall, 4) if recall is not None else None,
                 "f1": round(f1, 4) if f1 is not None else None,
                 "fpr": round(fpr, 4) if fpr is not None else None,
+                "youden": youden,
             })
             done += 1
             print(
@@ -188,7 +191,7 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-top", type=Path, default=None,
                         help="If set, save top-N rows to this file")
     parser.add_argument("--top-n", type=int, default=20)
-    parser.add_argument("--min-frames", type=int, default=8)
+    parser.add_argument("--min-frames", type=int, default=0)
     return parser
 
 
@@ -209,8 +212,13 @@ if __name__ == "__main__":
 
     results = run_grid(grouped, nb_frames_values, conf_thresh_values)
 
-    results_df = pd.DataFrame(results).sort_values("f1", ascending=False)
-    print(f"\n── Top {args.top_n} by F1 ──────────────────────────────────────────────")
+    # Ties go to the lower FPR, then the grid order, so the pick is deterministic.
+    results_df = pd.DataFrame(results).sort_values(
+        ["youden", "fpr", "nb_consecutive_frames", "conf_thresh"],
+        ascending=[False, True, True, True],
+    )
+    results_df["youden"] = results_df["youden"].round(4)
+    print(f"\n── Top {args.top_n} by Youden's J (recall − FPR) ─────────────────────────")
     print(results_df.head(args.top_n).to_string(index=False))
 
     results_df.to_csv(args.output, sep="\t", index=False)
