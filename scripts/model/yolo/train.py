@@ -12,7 +12,6 @@ from ultralytics import settings
 
 from pyro_train.data.utils import yaml_read, yaml_write
 from pyro_train.model.yolo.train import load_pretrained_model, train
-from pyro_train.utils import resolve_device
 
 
 def resolve_data_yaml(data_yaml_path: Path) -> Path:
@@ -112,14 +111,11 @@ if __name__ == "__main__":
         # Update ultralytics settings to log with MLFlow
         settings.update({"mlflow": True})
 
-        device = args["device"] or resolve_device()
-        logging.info(f"Using device: {device}")
-
         train(
             model=model,
             data_yaml_path=resolve_data_yaml(args["data"]),
             params=params,
-            device=device,
+            device=args["device"],
             project=str(args["output_dir"]),
             experiment_name=args["experiment_name"],
         )

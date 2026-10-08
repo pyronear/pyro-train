@@ -33,6 +33,10 @@ stages:
     - ./scripts/data/model_input/build.py
     - ./scripts/model/yolo/configs/best.yaml
     - ./scripts/model/yolo/train.py
+    - ./src/pyro_train/model/yolo/train.py
+    - ./src/pyro_train/model/yolo/augment.py
+    - ./src/pyro_train/data/utils.py
+    - ./src/pyro_train/utils.py
     outs:
     - ./data/02_models/yolo/best
 
@@ -86,6 +90,7 @@ stages:
       --top-n 20
     deps:
     - optimize_sequential.py
+    - ./src/pyro_train/model/sequential.py
     - ./data/03_reporting/sequential/predictions_labels_val
     outs:
     - ./data/03_reporting/sequential/grid_search_val.tsv
