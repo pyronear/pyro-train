@@ -37,6 +37,7 @@ stages:
     - ./src/pyro_train/model/yolo/augment.py
     - ./src/pyro_train/data/utils.py
     - ./src/pyro_train/utils.py
+    - uv.lock
     outs:
     - ./data/02_models/yolo/best
 
@@ -91,6 +92,7 @@ stages:
     deps:
     - optimize_sequential.py
     - ./src/pyro_train/model/sequential.py
+    - uv.lock
     - ./data/03_reporting/sequential/predictions_labels_val
     outs:
     - ./data/03_reporting/sequential/grid_search_val.tsv

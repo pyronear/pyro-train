@@ -73,13 +73,13 @@ def write_data_yaml(yaml_filepath: Path, source_dir: Path | None = None) -> None
     if source_dir is not None:
         # Keep the same JPG-only image set as the copying path.
         for split in ("train", "val"):
+            images = sorted((source_dir / "images" / split).glob("*.jpg"))
+            # Rebuild generated caches: their size-based hashes can miss edits.
+            (source_dir / "labels" / f"{split}.cache").unlink(missing_ok=True)
+            for path in images:
+                path.with_suffix(".npy").unlink(missing_ok=True)
             manifest = yaml_filepath.parent / f"{split}.txt"
-            manifest.write_text(
-                "".join(
-                    f"{path.resolve()}\n"
-                    for path in sorted((source_dir / "images" / split).glob("*.jpg"))
-                )
-            )
+            manifest.write_text("".join(f"{path.absolute()}\n" for path in images))
             content[split] = str(manifest.resolve())
     yaml_write(to=yaml_filepath, data=content)
 

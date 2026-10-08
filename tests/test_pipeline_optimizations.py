@@ -66,7 +66,7 @@ def test_training_forwards_settings_and_resolves_device(tmp_path, monkeypatch):
 
 def test_dataset_full_reference_and_subsample(tmp_path):
     from pyro_train.data.utils import yaml_read
-    from ultralytics.data.base import BaseDataset
+    from ultralytics.data.dataset import YOLODataset
     from ultralytics.data.utils import img2label_paths
 
     source, output = tmp_path / "source", tmp_path / "output"
@@ -76,18 +76,30 @@ def test_dataset_full_reference_and_subsample(tmp_path):
         for index in range(4):
             Image.new("RGB", (32, 32)).save(source / "images" / split / f"{index}.jpg")
             (source / "labels" / split / f"{index}.txt").write_text("0 .5 .5 .2 .2\n")
+        image = source / "images" / split / "0.jpg"
+        image.rename(tmp_path / f"{split}-cache-object")
+        image.symlink_to(tmp_path / f"{split}-cache-object")
         Image.new("RGB", (32, 32)).save(source / "images" / split / "extra.png")
     script = load("scripts/data/model_input/build.py")
     command = [sys.executable, script.__file__, "--input-dir", str(source)]
     command += ["--output-dir", str(output)]
     subprocess.run([*command, "--sampling-ratio", "1"], check=True)
     config = yaml_read(output / "datasets" / "data.yaml")
-    files = BaseDataset.get_img_files(
-        SimpleNamespace(prefix="", fraction=1), config["train"]
+    dataset = YOLODataset(
+        config["train"], data=config, cache=False, augment=False, imgsz=32
     )
+    files = dataset.im_files
     assert len(files) == 4 and all(path.endswith(".jpg") for path in files)
     assert all(Path(path).exists() for path in img2label_paths(files))
     assert not list(output.rglob("*.jpg"))
+    np.save(source / "images/train/0.npy", np.full((32, 32, 3), 255, dtype=np.uint8))
+    (source / "labels/train/0.txt").write_text("0 .1 .1 .2 .2\n")
+    subprocess.run([*command, "--sampling-ratio", "1"], check=True)
+    dataset = YOLODataset(
+        config["train"], data=config, cache=False, augment=False, imgsz=32
+    )
+    assert dataset.labels[0]["bboxes"][0, 0] == pytest.approx(0.1)
+    assert dataset.load_image(0)[0].mean() == 0
     subprocess.run([*command, "--sampling-ratio", "0.5"], check=True)
     assert len(list((output / "datasets/train/images").glob("*.jpg"))) == 2
     assert len(list((output / "datasets/val/images").glob("*.jpg"))) == 4
