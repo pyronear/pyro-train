@@ -1,11 +1,11 @@
 import hashlib
 from pathlib import Path
 
-import torch
-
 
 def resolve_device() -> str:
     """Return the best available device: cuda > mps > cpu."""
+    import torch
+
     if torch.cuda.is_available():
         return "cuda"
     if torch.backends.mps.is_available():

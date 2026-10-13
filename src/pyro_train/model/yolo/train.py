@@ -7,6 +7,7 @@ from pathlib import Path
 from ultralytics import YOLO
 
 from pyro_train.model.yolo.augment import install_camera_robustness_augmentations
+from pyro_train.utils import resolve_device
 
 
 def load_pretrained_model(model_str: str) -> YOLO:
@@ -20,7 +21,7 @@ def train(
     model: YOLO,
     data_yaml_path: Path,
     params: dict,
-    device: str = "cpu",
+    device: str | None = None,
     project: str = "data/04_models/yolo/",
     experiment_name: str = "train",
 ):
@@ -58,35 +59,11 @@ def train(
         "translate": 0.1,
     }
     params = {**default_params, **params}
-    model.train(
+    params.pop("model_type", None)
+    params.update(
         project=str(Path(project).resolve()),
         name=experiment_name,
         data=data_yaml_path.absolute(),
-        device=device,
-        # train Parameters
-        batch=params["batch"],
-        cos_lr=params["cos_lr"],
-        epochs=params["epochs"],
-        imgsz=params["imgsz"],
-        lr0=params["lr0"],
-        lrf=params["lrf"],
-        optimizer=params["optimizer"],
-        patience=params["patience"],
-        warmup_epochs=params["warmup_epochs"],
-        # val parameters
-        box=params["box"],
-        cls=params["cls"],
-        dfl=params["dfl"],
-        iou=params["iou"],
-        single_cls=params["single_cls"],
-        # Data Augmentation parameters
-        close_mosaic=params["close_mosaic"],
-        degrees=params["degrees"],
-        fliplr=params["fliplr"],
-        hsv_h=params["hsv_h"],
-        hsv_s=params["hsv_s"],
-        hsv_v=params["hsv_v"],
-        mixup=params["mixup"],
-        shear=params["shear"],
-        translate=params["translate"],
+        device=device if device is not None else params.get("device", resolve_device()),
     )
+    model.train(**params)

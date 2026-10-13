@@ -3,5 +3,5 @@
 # https://dvc.org/doc/user-guide/dvcignore
 #
 # Generated cache files during YOLO ultralytics training
-images.cache
-labels.cache
+*.cache
+*.npy

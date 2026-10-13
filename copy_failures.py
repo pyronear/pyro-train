@@ -10,108 +10,11 @@ import argparse
 import json
 import math
 import shutil
-import sys
-from collections import deque
 from pathlib import Path
-from types import ModuleType
 
-_Stub = type("_Stub", (), {"__init__": lambda *_, **__: None})
-for _pkg, _attr, _cls in [
-    ("pyro_camera_api_client", "client", "PyroCameraAPIClient"),
-    ("pyroclient", "client", "PyroClient"),
-]:
-    _sub = ModuleType(f"{_pkg}.{_attr}")
-    setattr(_sub, _cls, _Stub)
-    _top = ModuleType(_pkg)
-    setattr(_top, _attr, _sub)
-    sys.modules.setdefault(_pkg, _top)
-    sys.modules.setdefault(f"{_pkg}.{_attr}", _sub)
+from PIL import Image, ImageDraw, ImageFont
 
-import logging  # noqa: E402
-
-import numpy as np  # noqa: E402
-from PIL import Image, ImageDraw, ImageFont  # noqa: E402
-import pyroengine.engine  # noqa: E402
-from pyroengine.engine import Engine  # noqa: E402
-
-# Engine.__init__ builds a Classifier, which downloads a detector from
-# HuggingFace. Nothing here runs it: _make_engine swaps engine.model for
-# _PassthroughModel one line later, because this script replays predictions
-# computed upstream. The download was always dead weight, and became fatal once
-# the model repository stopped answering anonymously (HTTP 401).
-pyroengine.engine.Classifier = _Stub
-
-logging.getLogger().setLevel(logging.WARNING)
-logging.getLogger("pyroengine").setLevel(logging.WARNING)
-
-_DUMMY_FRAME = Image.new("RGB", (1, 1))
-
-
-def _parse_label_file(path: Path) -> np.ndarray:
-    dets = []
-    for line in path.read_text().splitlines():
-        if not line.strip():
-            continue
-        _, cx, cy, w, h, conf = (float(v) for v in line.split())
-        dets.append([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2, conf])
-    return np.array(dets, dtype=np.float32) if dets else np.empty((0, 5), dtype=np.float32)
-
-
-def load_labels_dir(
-    labels_dir: Path, min_frames: int = 0
-) -> dict[tuple[str, str], list[np.ndarray]]:
-    grouped: dict[tuple[str, str], list[np.ndarray]] = {}
-    for category in ("wildfire", "fp"):
-        cat_dir = labels_dir / category
-        if not cat_dir.exists():
-            continue
-        for seq_dir in sorted(cat_dir.iterdir()):
-            if not seq_dir.is_dir():
-                continue
-            label_files = sorted((seq_dir / "labels").glob("*.txt"))
-            if len(label_files) < min_frames:
-                continue
-            grouped[(category, seq_dir.name)] = [_parse_label_file(lf) for lf in label_files]
-    return grouped
-
-
-class _PassthroughModel:
-    def post_process(self, fake_pred: np.ndarray, **_: object) -> np.ndarray:
-        return fake_pred
-
-
-def _make_engine(nb_consecutive_frames: int, conf_thresh: float) -> Engine:
-    cache = Path("/tmp/pyro_failures_cache")
-    cache.mkdir(parents=True, exist_ok=True)
-    engine = Engine(
-        conf_thresh=conf_thresh,
-        nb_consecutive_frames=nb_consecutive_frames,
-        cache_folder=str(cache),
-    )
-    engine.model = _PassthroughModel()  # type: ignore[assignment]
-    return engine
-
-
-def _reset_state(engine: Engine, cam_key: str) -> None:
-    engine._states[cam_key] = {  # noqa: SLF001
-        "last_predictions": deque(maxlen=engine.nb_consecutive_frames),
-        "ongoing": False,
-        "last_image_sent": None,
-        "last_bbox_mask_fetch": None,
-        "anchor_bbox": None,
-        "anchor_ts": None,
-        "miss_count": 0,
-    }
-    engine.occlusion_masks[cam_key] = (None, {}, 0)  # noqa: SLF001
-
-
-def _evaluate_sequence(engine: Engine, frames: list[np.ndarray], cam_key: str) -> int | None:
-    """Zero-based index of the frame the engine alerts on, or None."""
-    _reset_state(engine, cam_key)
-    for i, fake_pred in enumerate(frames):
-        if engine.predict(_DUMMY_FRAME, cam_id=cam_key, fake_pred=fake_pred) > engine.conf_thresh:
-            return i
-    return None
+from pyro_train.model.sequential import Replay, load_labels_dir, parse_label_file
 
 
 def wilson_ci95(successes: int, n: int) -> list[float] | None:
@@ -136,7 +39,8 @@ def detected_within_frames(
     """
     return {
         str(k): round(sum(t is not None and t < k for t in triggers) / len(triggers), 4)
-        if triggers else None
+        if triggers
+        else None
         for k in ks
     }
 
@@ -148,14 +52,29 @@ def _parse_gt_label_file(path: Path) -> list[tuple[float, float, float, float]]:
         parts = line.strip().split()
         if len(parts) < 5:
             continue
-        _, cx, cy, w, h = float(parts[0]), float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4])
+        _, cx, cy, w, h = (
+            float(parts[0]),
+            float(parts[1]),
+            float(parts[2]),
+            float(parts[3]),
+            float(parts[4]),
+        )
         boxes.append((cx, cy, w, h))
     return boxes
 
 
-def _draw_box(draw: "ImageDraw.ImageDraw", cx: float, cy: float, w: float, h: float,  # type: ignore[name-defined]
-              img_w: int, img_h: int, color: str, label: str = "",
-              font: object = None) -> None:
+def _draw_box(
+    draw: "ImageDraw.ImageDraw",
+    cx: float,
+    cy: float,
+    w: float,
+    h: float,  # type: ignore[name-defined]
+    img_w: int,
+    img_h: int,
+    color: str,
+    label: str = "",
+    font: object = None,
+) -> None:
     x1 = int((cx - w / 2) * img_w)
     y1 = int((cy - h / 2) * img_h)
     x2 = int((cx + w / 2) * img_w)
@@ -188,7 +107,9 @@ def annotate_sequence(
     annotated_dir = seq_dest / "annotated"
     annotated_dir.mkdir(parents=True, exist_ok=True)
 
-    for img_path in sorted(images_dest.glob("*.jpg")) + sorted(images_dest.glob("*.png")):
+    for img_path in sorted(images_dest.glob("*.jpg")) + sorted(
+        images_dest.glob("*.png")
+    ):
         img = Image.open(img_path).convert("RGB")
         draw = ImageDraw.Draw(img)
         iw, ih = img.size
@@ -202,7 +123,7 @@ def annotate_sequence(
         # Predictions (red)
         pred_file = pred_labels_dir / img_path.with_suffix(".txt").name
         if pred_file.exists():
-            for det in _parse_label_file(pred_file):
+            for det in parse_label_file(pred_file):
                 # det is [x1,y1,x2,y2,conf] — convert back to cx,cy,w,h
                 x1, y1, x2, y2, conf = det
                 cx = (x1 + x2) / 2
@@ -217,16 +138,28 @@ def annotate_sequence(
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument("--labels-dir", type=Path, default=Path("predictions_labels"))
-    parser.add_argument("--data-dir", type=Path, required=True,
-                        help="Root dir with wildfire/ and fp/ subfolders (source images to copy)")
+    parser.add_argument(
+        "--data-dir",
+        type=Path,
+        required=True,
+        help="Root dir with wildfire/ and fp/ subfolders (source images to copy)",
+    )
     parser.add_argument("--output-dir", type=Path, default=Path("failures"))
     parser.add_argument("--nb-consecutive-frames", type=int, default=5)
     parser.add_argument("--conf-thresh", type=float, default=0.2)
     parser.add_argument("--min-frames", type=int, default=0)
-    parser.add_argument("--output-json", type=Path, default=None,
-                        help="If set, save evaluation metrics as JSON to this path")
-    parser.add_argument("--output-predictions", type=Path, default=None,
-                        help="If set, write each sequence's decision here, to pair two models")
+    parser.add_argument(
+        "--output-json",
+        type=Path,
+        default=None,
+        help="If set, save evaluation metrics as JSON to this path",
+    )
+    parser.add_argument(
+        "--output-predictions",
+        type=Path,
+        default=None,
+        help="If set, write each sequence's decision here, to pair two models",
+    )
     return parser
 
 
@@ -235,8 +168,10 @@ if __name__ == "__main__":
 
     grouped = load_labels_dir(args.labels_dir, min_frames=args.min_frames)
 
-    engine = _make_engine(args.nb_consecutive_frames, args.conf_thresh)
-    print(f"nb_consecutive_frames={args.nb_consecutive_frames}  conf_thresh={args.conf_thresh}")
+    replay = Replay(args.nb_consecutive_frames, args.conf_thresh)
+    print(
+        f"nb_consecutive_frames={args.nb_consecutive_frames}  conf_thresh={args.conf_thresh}"
+    )
 
     if args.output_dir.exists():
         shutil.rmtree(args.output_dir)
@@ -250,13 +185,20 @@ if __name__ == "__main__":
     tp = fn = fp = tn = 0
     predictions, wildfire_triggers = [], []
     for (category, sequence), frames in grouped.items():
-        trigger = _evaluate_sequence(engine, frames, sequence)
+        trigger = replay.trigger(frames)
         alerted = trigger is not None
-        predictions.append({"category": category, "sequence": sequence,
-                            "alerted": alerted, "trigger_frame": trigger})
+        predictions.append(
+            {
+                "category": category,
+                "sequence": sequence,
+                "alerted": alerted,
+                "trigger_frame": trigger,
+            }
+        )
         if category == "wildfire":
             wildfire_triggers.append(trigger)
-            if alerted: tp += 1
+            if alerted:
+                tp += 1
             else:
                 fn += 1
                 fn_seqs.append(sequence)
@@ -270,18 +212,26 @@ if __name__ == "__main__":
     precision = tp / (tp + fp) if (tp + fp) > 0 else float("nan")
     recall = tp / (tp + fn) if (tp + fn) > 0 else float("nan")
     fpr = fp / (fp + tn) if (fp + tn) > 0 else float("nan")
-    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else float("nan")
+    f1 = (
+        2 * precision * recall / (precision + recall)
+        if (precision + recall) > 0
+        else float("nan")
+    )
 
     print(f"\n{'':─<55}")
     print(f"  TP={tp}  FN={fn}  FP={fp}  TN={tn}")
-    print(f"  Recall={recall:.1%}  FPR={fpr:.1%}  Precision={precision:.1%}  F1={f1:.3f}")
+    print(
+        f"  Recall={recall:.1%}  FPR={fpr:.1%}  Precision={precision:.1%}  F1={f1:.3f}"
+    )
     print(f"{'':─<55}")
 
     def copy_seq(category: str, sequence: str, dest_dir: Path) -> None:
         src = args.data_dir / category / sequence
         if src.exists():
             shutil.copytree(src, dest_dir / sequence, dirs_exist_ok=True)
-            annotate_sequence(dest_dir / sequence, category, sequence, args.data_dir, args.labels_dir)
+            annotate_sequence(
+                dest_dir / sequence, category, sequence, args.data_dir, args.labels_dir
+            )
         else:
             print(f"  WARNING: source not found: {src}")
 
@@ -299,6 +249,7 @@ if __name__ == "__main__":
 
     if args.output_json is not None:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
+
         def _safe(v: float) -> float | None:
             return round(v, 4) if not math.isnan(v) else None
 
@@ -308,7 +259,10 @@ if __name__ == "__main__":
             "nb_consecutive_frames": args.nb_consecutive_frames,
             "conf_thresh": args.conf_thresh,
             "num_sequences": len(grouped),
-            "tp": tp, "fn": fn, "fp": fp, "tn": tn,
+            "tp": tp,
+            "fn": fn,
+            "fp": fp,
+            "tn": tn,
             "recall": _safe(recall),
             "fpr": _safe(fpr),
             "recall_ci95": wilson_ci95(tp, tp + fn),
