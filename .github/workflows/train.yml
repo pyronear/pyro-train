@@ -57,7 +57,10 @@ jobs:
           echo "MAIN_SHA=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_ENV"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          resolution-strategy: lowest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
