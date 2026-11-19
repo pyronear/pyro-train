@@ -50,12 +50,29 @@ source .venv/bin/activate
 
 ### Data Dependencies
 
-The dataset is fetched automatically from [pyro-dataset](https://github.com/pyronear/pyro-dataset)
-as the first stage of the pipeline — no AWS credentials needed. Just run:
+By default the pipeline trains on the public
+[pyro-sdis](https://huggingface.co/datasets/pyronear/pyro-sdis) dataset from
+Hugging Face. No credentials are needed:
 
 ```sh
-uv run dvc repro fetch_model_input
+uv run dvc repro train_yolo_best
 ```
+
+This is enough to train and export a model. The sequential stages
+(`fetch_sequential_val` and after, so a bare `dvc repro`) and the test
+evaluation use data that is only on the Pyronear S3 remote.
+
+Pyronear members and the CI use the full dataset from
+[pyro-dataset](https://github.com/pyronear/pyro-dataset), which needs S3 access:
+
+```sh
+DATASET_SOURCE=dvc uv run dvc repro train_yolo_best
+```
+
+DVC does not track `DATASET_SOURCE`. To switch source when the data is already
+on disk, run `uv run dvc repro --force fetch_model_input` with the new value.
+The committed `dvc.lock` describes the full dataset, so do not commit the
+`dvc.lock` changes made by a pyro-sdis run.
 
 For model artifacts (weights, exports), you need access to the Pyronear S3 remote,
 reserved for Pyronear members. On request, you will be provided with AWS credentials.
