@@ -45,6 +45,9 @@ jobs:
     timeout-minutes: 1440
     env:
       DATASET_REV: v4.7.0
+      # Full dataset from pyro-dataset; the pipeline default is the public
+      # Hugging Face dataset.
+      DATASET_SOURCE: dvc
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4

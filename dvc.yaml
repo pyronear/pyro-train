@@ -1,14 +1,25 @@
 stages:
+  # Default: public pyro-sdis dataset from Hugging Face, no credentials needed.
+  # DATASET_SOURCE=dvc (set in CI) fetches the full dataset, which needs S3 access.
   fetch_model_input:
     cmd:
     - >-
+      if [ "$DATASET_SOURCE" = dvc ]; then
       uv run dvc get https://github.com/pyronear/pyro-dataset
       data/processed/yolo_train_val --rev v4.7.0
       --out ./data/01_model_input/yolo_train_val
       ||
       uv run dvc get git@github.com:pyronear/pyro-dataset.git
       data/processed/yolo_train_val --rev v4.7.0
-      --out ./data/01_model_input/yolo_train_val
+      --out ./data/01_model_input/yolo_train_val;
+      else
+      uv run python ./scripts/data/model_input/fetch_hf.py
+      --revision v2.0
+      --output-dir ./data/01_model_input/yolo_train_val
+      --loglevel info;
+      fi
+    deps:
+    - ./scripts/data/model_input/fetch_hf.py
     outs:
     - ./data/01_model_input/yolo_train_val
 
