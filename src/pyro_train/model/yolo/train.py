@@ -8,9 +8,10 @@ from ultralytics import YOLO
 
 from pyro_train.model.yolo.augment import install_camera_robustness_augmentations
 
+from pyro_train.carbon import start_tracker, stop_and_save
 
 def load_pretrained_model(model_str: str) -> YOLO:
-    """
+    """x
     Loads the pretrained `model`
     """
     return YOLO(model_str)
@@ -58,35 +59,46 @@ def train(
         "translate": 0.1,
     }
     params = {**default_params, **params}
-    model.train(
-        project=str(Path(project).resolve()),
-        name=experiment_name,
-        data=data_yaml_path.absolute(),
-        device=device,
-        # train Parameters
-        batch=params["batch"],
-        cos_lr=params["cos_lr"],
-        epochs=params["epochs"],
-        imgsz=params["imgsz"],
-        lr0=params["lr0"],
-        lrf=params["lrf"],
-        optimizer=params["optimizer"],
-        patience=params["patience"],
-        warmup_epochs=params["warmup_epochs"],
-        # val parameters
-        box=params["box"],
-        cls=params["cls"],
-        dfl=params["dfl"],
-        iou=params["iou"],
-        single_cls=params["single_cls"],
-        # Data Augmentation parameters
-        close_mosaic=params["close_mosaic"],
-        degrees=params["degrees"],
-        fliplr=params["fliplr"],
-        hsv_h=params["hsv_h"],
-        hsv_s=params["hsv_s"],
-        hsv_v=params["hsv_v"],
-        mixup=params["mixup"],
-        shear=params["shear"],
-        translate=params["translate"],
-    )
+
+    tracker = start_tracker(experiment_name)
+    try:
+        model.train(
+            project=str(Path(project).resolve()),
+            name=experiment_name,
+            data=data_yaml_path.absolute(),
+            device=device,
+            # train Parameters
+            batch=params["batch"],
+            cos_lr=params["cos_lr"],
+            epochs=params["epochs"],
+            imgsz=params["imgsz"],
+            lr0=params["lr0"],
+            lrf=params["lrf"],
+            optimizer=params["optimizer"],
+            patience=params["patience"],
+            warmup_epochs=params["warmup_epochs"],
+            # val parameters
+            box=params["box"],
+            cls=params["cls"],
+            dfl=params["dfl"],
+            iou=params["iou"],
+            single_cls=params["single_cls"],
+            # Data Augmentation parameters
+            close_mosaic=params["close_mosaic"],
+            degrees=params["degrees"],
+            fliplr=params["fliplr"],
+            hsv_h=params["hsv_h"],
+            hsv_s=params["hsv_s"],
+            hsv_v=params["hsv_v"],
+            mixup=params["mixup"],
+            shear=params["shear"],
+            translate=params["translate"],
+        )
+    finally:
+        trainer = getattr(model, "trainer", None)
+        save_dir = (
+            Path(trainer.save_dir)
+            if trainer is not None
+            else Path(project).resolve() / experiment_name
+        )
+        stop_and_save(tracker, save_dir)

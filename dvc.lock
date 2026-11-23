@@ -189,17 +189,24 @@ stages:
       nfiles: 5
   fetch_model_input:
     cmd:
-    - uv run dvc get https://github.com/pyronear/pyro-dataset 
-      data/processed/yolo_train_val --rev v4.7.0 --out 
-      ./data/01_model_input/yolo_train_val || uv run dvc get 
+    - if [ "$DATASET_SOURCE" = dvc ]; then uv run dvc get 
+      https://github.com/pyronear/pyro-dataset data/processed/yolo_train_val 
+      --rev v4.7.0 --out ./data/01_model_input/yolo_train_val || uv run dvc get 
       git@github.com:pyronear/pyro-dataset.git data/processed/yolo_train_val 
-      --rev v4.7.0 --out ./data/01_model_input/yolo_train_val
+      --rev v4.7.0 --out ./data/01_model_input/yolo_train_val; else uv run 
+      python ./scripts/data/model_input/fetch_hf.py --revision v2.0 --output-dir
+      ./data/01_model_input/yolo_train_val --loglevel info; fi
+    deps:
+    - path: ./scripts/data/model_input/fetch_hf.py
+      hash: md5
+      md5: 07c2997386f496a2f24dfcc2a487bd82
+      size: 2909
     outs:
     - path: ./data/01_model_input/yolo_train_val
       hash: md5
-      md5: 31c0e3708401fa0ce1595d3cbf257079.dir
-      size: 2525773533
-      nfiles: 40367
+      md5: 0e171b351c10dc3f2d04e4d3338a8eff.dir
+      size: 1334878621
+      nfiles: 24756
   fetch_sequential_val:
     cmd:
     - uv run dvc get https://github.com/pyronear/pyro-dataset 
