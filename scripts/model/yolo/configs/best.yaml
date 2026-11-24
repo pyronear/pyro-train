@@ -1,7 +1,7 @@
 ---
 model_type: yolo11s.pt
 warmup_epochs: 6
-epochs: 1
+epochs: 50
 patience: 20
 batch: 16
 imgsz: 1024
